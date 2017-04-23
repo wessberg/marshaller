@@ -1,0 +1,4 @@
+tsconfig.*
+/src/
+/test/
+/compiled/
