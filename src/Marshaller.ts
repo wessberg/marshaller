@@ -1,5 +1,5 @@
 import {IMarshaller, Newable} from "./interface/IMarshaller";
-import {ITypeDetector, IArbitraryObject} from "typedetector";
+import {ITypeDetector, IArbitraryObject} from "@wessberg/typedetector";
 
 /**
  * A class that maps between a variety of data types.

@@ -1,6 +1,6 @@
 import test from "ava";
-import {TypeDetector} from "typedetector";
 import {Marshaller} from "../src/Marshaller";
+import {TypeDetector} from "@wessberg/typedetector";
 
 const marshaller = new Marshaller(new TypeDetector());
 let MARSHALLER_STRING_TEST_COUNT = 0;
