@@ -17,7 +17,7 @@ export class Marshaller implements IMarshaller {
 	 * @param {U} [hint]
 	 * @returns {null|U}
 	 */
-	public marshal<T, U> (data: T, hint?: U): U | null|undefined {
+	public marshal<T, U> (data: T, hint?: U|Newable<U>): U | null|undefined {
 		if (hint != null) return <U | null>this.marshalTo(data, hint);
 		else return <U | null>this.marshalToBestGuess<T>(data);
 	}
