@@ -600,6 +600,17 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * If the string starts with a number but should be a string nevertheless, this method returns true.
+	 * @param {string} value
+	 * @returns {boolean}
+	 */
+	private startsWithNumberButShouldEnforceString (value: string): boolean {
+		// If the value starts with a digit and possibly a '.' character but then goes on with something
+		// else, enforce a string.
+		return /^\d+[.]*[^\d.]+/.test(value.trim());
+	}
+
+	/**
 	 * Parses the string and and marshals it into the most fitting type based on heuristics.
 	 * @param {string} data
 	 * @returns {{}|null}
@@ -617,7 +628,10 @@ export class Marshaller implements IMarshaller {
 
 		// It might be a number.
 		const toNum = Number.parseFloat(primitive);
-		if (!isNaN(toNum)) return toNum;
+		if (!isNaN(toNum)) {
+			if (this.startsWithNumberButShouldEnforceString(primitive)) return primitive;
+			return toNum;
+		}
 
 		// It might be an array
 		if (primitive.startsWith("[") && primitive.endsWith("]")) return JSON.parse(primitive);
