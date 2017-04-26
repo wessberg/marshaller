@@ -37,11 +37,12 @@ The marshalled version of the input data.
 
 ## Roadmap
 * [X] Casting from/to `Set`.
-* [X] Casting from/to `Object`.
-* [X] Casting from/to `String`.
-* [X] Casting from/to `Number`.
-* [X] Casting from/to `Boolean`.
+* [X] Casting from/to `object`.
+* [X] Casting from/to `string`.
+* [X] Casting from/to `number`.
+* [X] Casting from/to `boolean`.
 * [X] Casting from/to `Array`.
+* [X] Casting from/to `symbol`.
 * [ ] Casting from/to `Date`.
 * [ ] Casting from/to `Function`
 * [ ] Casting from/to `Map`
@@ -50,6 +51,10 @@ The marshalled version of the input data.
 * [ ] Casting from/to `RegExp`
 
 ## Changelog:
+
+**v1.0.3**:
+
+- Added marshalling to/from `symbol`.
 
 **v1.0.2**:
 

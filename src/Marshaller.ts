@@ -6,6 +6,7 @@ import {ITypeDetector, IArbitraryObject} from "@wessberg/typedetector";
  * @author Frederik Wessberg
  */
 export class Marshaller implements IMarshaller {
+	private static readonly SYMBOL_REGEX: RegExp = /Symbol\(([^)]*)\)/;
 
 	constructor (private typeDetector: ITypeDetector) {}
 
@@ -31,6 +32,17 @@ export class Marshaller implements IMarshaller {
 		let representation = "";
 		data.forEach(entry => representation += JSON.stringify(entry, null, "\t"));
 		return representation;
+	}
+
+	/**
+	 * Marshals a symbol into a string.
+	 * @param {symbol} data
+	 * @returns {string}
+	 */
+	private marshalSymbolToString (data: symbol): string {
+		const match = data.toString().match(Marshaller.SYMBOL_REGEX);
+		if (match == null) throw new ReferenceError(`${this.marshalSymbolToString.name} was given an invalid symbol to marshal!`);
+		return match[1];
 	}
 
 	/**
@@ -80,6 +92,17 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * Marshals a symbol into a boolean.
+	 * @param {symbol} data
+	 * @returns {boolean}
+	 */
+	private marshalSymbolToBoolean (data: symbol): boolean {
+		const match = data.toString().match(Marshaller.SYMBOL_REGEX);
+		if (match == null) throw new ReferenceError(`${this.marshalSymbolToBoolean.name} was given an invalid symbol to marshal!`);
+		return this.marshalStringToBoolean(match[1]);
+	}
+
+	/**
 	 * Marshals a Set into a boolean.
 	 * @param {Set<T>} _
 	 * @returns {boolean}
@@ -117,6 +140,68 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * Marshals a string into a symbol.
+	 * @param {string} data
+	 * @returns {symbol}
+	 */
+	private marshalStringToSymbol (data: string | String): symbol {
+		const primitive = data instanceof String ? data.valueOf() : data;
+
+		if (Marshaller.SYMBOL_REGEX.test(primitive)) {
+			const content = primitive.match(Marshaller.SYMBOL_REGEX);
+			if (content != null) return Symbol(content[1]);
+		}
+		return Symbol(primitive);
+	}
+
+	/**
+	 * Marshals a number into a symbol.
+	 * @param {number} data
+	 * @returns {symbol}
+	 */
+	private marshalNumberToSymbol (data: number | Number): symbol {
+		const primitive = data instanceof Number ? data.valueOf() : data;
+		return Symbol(this.marshalNumberToString(primitive));
+	}
+
+	/**
+	 * Marshals a set into a symbol.
+	 * @param {Set<T>} data
+	 * @returns {symbol}
+	 */
+	private marshalSetToSymbol<T> (data: Set<T>): symbol {
+		return Symbol(this.marshalSetToString(data));
+	}
+
+	/**
+	 * Marshals an array into a symbol.
+	 * @param {T[]} data
+	 * @returns {symbol}
+	 */
+	private marshalArrayToSymbol<T> (data: T[]): symbol {
+		return Symbol(this.marshalArrayToString(data));
+	}
+
+	/**
+	 * Marshals an object into a symbol.
+	 * @param {object} data
+	 * @returns {symbol}
+	 */
+	private marshalObjectToSymbol<T> (data: { [key: string]: T }): symbol {
+		return Symbol(this.marshalObjectToString(data));
+	}
+
+	/**
+	 * Marshals a boolean into a symbol.
+	 * @param {boolean} data
+	 * @returns {symbol}
+	 */
+	private marshalBooleanToSymbol (data: boolean | Boolean): symbol {
+		const primitive = data instanceof Boolean ? data.valueOf() : data;
+		return Symbol(this.marshalBooleanToString(primitive));
+	}
+
+	/**
 	 * Marshals a string into a number.
 	 * @param {string} data
 	 * @returns {number}
@@ -124,6 +209,17 @@ export class Marshaller implements IMarshaller {
 	private marshalStringToNumber (data: string | String): number {
 		const primitive = data instanceof String ? data.valueOf() : data;
 		return Number.parseFloat(primitive);
+	}
+
+	/**
+	 * Marshals a symbol into a number.
+	 * @param {symbol} data
+	 * @returns {number}
+	 */
+	private marshalSymbolToNumber (data: symbol): number {
+		const match = data.toString().match(Marshaller.SYMBOL_REGEX);
+		if (match == null) throw new ReferenceError(`${this.marshalSymbolToNumber.name} was given an invalid symbol to marshal!`);
+		return this.marshalStringToNumber(match[1]);
 	}
 
 	/**
@@ -171,6 +267,17 @@ export class Marshaller implements IMarshaller {
 	private marshalStringToSet (data: string | String): Set<string> {
 		const primitive = data instanceof String ? data.valueOf() : data;
 		return new Set([primitive]);
+	}
+
+	/**
+	 * Marshals a symbol into a boolean.
+	 * @param {symbol} data
+	 * @returns {Set<string>}
+	 */
+	private marshalSymbolToSet (data: symbol): Set<string> {
+		const match = data.toString().match(Marshaller.SYMBOL_REGEX);
+		if (match == null) throw new ReferenceError(`${this.marshalSymbolToSet.name} was given an invalid symbol to marshal!`);
+		return this.marshalStringToSet(match[1]);
 	}
 
 	/**
@@ -228,6 +335,17 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * Marshals a symbol into an array.
+	 * @param {symbol} data
+	 * @returns {string[]}
+	 */
+	private marshalSymbolToArray (data: symbol): string[] {
+		const match = data.toString().match(Marshaller.SYMBOL_REGEX);
+		if (match == null) throw new ReferenceError(`${this.marshalSymbolToArray.name} was given an invalid symbol to marshal!`);
+		return this.marshalStringToArray(match[1]);
+	}
+
+	/**
 	 * Marshals a set into an Array.
 	 * @param {Set<T>} data
 	 * @returns {T[]}
@@ -278,17 +396,18 @@ export class Marshaller implements IMarshaller {
 
 	/**
 	 * Marshals a string into an Object.
-	 * @param {string} data
+	 * @param {string|String} data
 	 * @param {number} [attempt=0]
 	 * @returns {object}
 	 */
-	private marshalStringToObject (data: string, attempt: number = 0): { [key: string]: string } {
-		try { return JSON.parse(data);
+	private marshalStringToObject (data: string|String, attempt: number = 0): { [key: string]: string } {
+		const primitive = data instanceof String ? data.valueOf() : data;
+		try { return JSON.parse(primitive);
 		} catch (e) {
 
 			if (attempt === 0) {
 				// Try to format the string so it fits the JSON standard.
-				let trimmed = data
+				let trimmed = primitive
 					.replace(/([{,:}"\]])([ \t\r\n]*)/g, (_, p1) => `${p1}`)
 					.replace(/([{,])(\w+)(:)/g, (_, p1, p2, p3) => `${p1}"${p2}"${p3}`)
 					.trim();
@@ -297,10 +416,20 @@ export class Marshaller implements IMarshaller {
 			}
 
 			const obj: { [key: number]: string } = {};
-			for (let i = 0; i < data.length; i++) obj[i] = data[i];
+			for (let i = 0; i < primitive.length; i++) obj[i] = primitive[i];
 			return obj;
 		}
+	}
 
+	/**
+	 * Marshals a symbol into an object.
+	 * @param {symbol} data
+	 * @returns {object}
+	 */
+	private marshalSymbolToObject (data: symbol): { [key: string]: string } {
+		const match = data.toString().match(Marshaller.SYMBOL_REGEX);
+		if (match == null) throw new ReferenceError(`${this.marshalSymbolToObject.name} was given an invalid symbol to marshal!`);
+		return this.marshalStringToObject(match[1]);
 	}
 
 	/**
@@ -343,6 +472,7 @@ export class Marshaller implements IMarshaller {
 	private marshalToBoolean<T> (data: T): boolean | null {
 		if (this.typeDetector.isBoolean(data)) return data;
 		if (this.typeDetector.isString(data))  return this.marshalStringToBoolean(data);
+		if (typeof data === "symbol") return this.marshalSymbolToBoolean(data);
 		if (data instanceof Set)     return this.marshalSetToBoolean(data);
 		if (Array.isArray(data))   return this.marshalArrayToBoolean(data);
 		if (this.typeDetector.isObject(data))  return this.marshalObjectToBoolean(data);
@@ -358,11 +488,29 @@ export class Marshaller implements IMarshaller {
 	private marshalToNumber<T> (data: T): number | null {
 		if (this.typeDetector.isNumber(data))   return data;
 		if (this.typeDetector.isString(data))  return this.marshalStringToNumber(data);
+		if (typeof data === "symbol") return this.marshalSymbolToNumber(data);
 		if (data instanceof Set)     return this.marshalSetToNumber(data);
 		if (Array.isArray(data))   return this.marshalArrayToNumber(data);
 		if (this.typeDetector.isObject(data))  return this.marshalObjectToNumber(data);
 		if (this.typeDetector.isBoolean(data)) return this.marshalBooleanToNumber(data);
 		return data == null ? null : 0;
+	}
+
+	/**
+	 * Marshals the given data, whatever the type, into a symbol.
+	 * @param {T} data
+	 * @returns {symbol|null}
+	 */
+	private marshalToSymbol<T> (data: T): symbol | null {
+		if (typeof data === "symbol") return data;
+		if (this.typeDetector.isString(data)) return this.marshalStringToSymbol(data);
+		if (data instanceof Set)      return this.marshalSetToSymbol(data);
+		if (Array.isArray(data))    return this.marshalArrayToSymbol(data);
+		if (this.typeDetector.isObject(data))  return this.marshalObjectToSymbol(data);
+		if (this.typeDetector.isBoolean(data))  return this.marshalBooleanToSymbol(data);
+		if (this.typeDetector.isNumber(data))    return this.marshalNumberToSymbol(data);
+		if (data == null) return null;
+		return Symbol(data.toString());
 	}
 
 	/**
@@ -372,6 +520,7 @@ export class Marshaller implements IMarshaller {
 	 */
 	private marshalToString<T> (data: T): string | null {
 		if (this.typeDetector.isString(data)) return (<String>data instanceof String ? <string>data.valueOf() : data);
+		if (typeof data === "symbol") return this.marshalSymbolToString(data);
 		if (data instanceof Set)      return this.marshalSetToString(data);
 		if (Array.isArray(data))    return this.marshalArrayToString(data);
 		if (this.typeDetector.isObject(data))  return this.marshalObjectToString(data);
@@ -389,6 +538,7 @@ export class Marshaller implements IMarshaller {
 	private marshalToSet<T> (data: T): Set<{}> | null {
 		if (data instanceof Set)      return data;
 		if (this.typeDetector.isString(data))   return this.marshalStringToSet(data);
+		if (typeof data === "symbol") return this.marshalSymbolToSet(data);
 		if (Array.isArray(data))    return this.marshalArrayToSet(data);
 		if (this.typeDetector.isObject(data))    return this.marshalObjectToSet(data);
 		if (this.typeDetector.isBoolean(data))  return this.marshalBooleanToSet(data);
@@ -404,6 +554,7 @@ export class Marshaller implements IMarshaller {
 	private marshalToArray<T> (data: T): {}[] | null {
 		if (Array.isArray(data))    return data;
 		if (this.typeDetector.isString(data))   return this.marshalStringToArray(data);
+		if (typeof data === "symbol") return this.marshalSymbolToArray(data);
 		if (data instanceof Set)      return this.marshalSetToArray(data);
 		if (this.typeDetector.isObject(data))    return this.marshalObjectToArray(data);
 		if (this.typeDetector.isBoolean(data))  return this.marshalBooleanToArray(data);
@@ -419,6 +570,7 @@ export class Marshaller implements IMarshaller {
 	private marshalToObject<T> (data: T): IArbitraryObject<{}>|null {
 		if (this.typeDetector.isObject(data))    return data;
 		if (Array.isArray(data))    return this.marshalArrayToObject(data);
+		if (typeof data === "symbol") return this.marshalSymbolToObject(data);
 		if (this.typeDetector.isString(data))   return this.marshalStringToObject(data);
 		if (data instanceof Set)      return this.marshalSetToObject(data);
 		if (this.typeDetector.isBoolean(data))  return this.marshalBooleanToObject(data);
@@ -433,7 +585,18 @@ export class Marshaller implements IMarshaller {
 	 */
 	private marshalToBestGuess<T> (data: T): {}|null|undefined {
 		if (this.typeDetector.isString(data)) return this.marshalFromStringToBestGuess(data);
+		if (typeof data === "symbol") return this.marshalFromSymbolToBestGuess(data);
 		return data;
+	}
+
+	/**
+	 * Parses the symbol and and marshals it into the most fitting type based on heuristics.
+	 * @param {symbol} data
+	 * @returns {{}|null}
+	 */
+	private marshalFromSymbolToBestGuess (data: symbol): {}|null|undefined {
+		const stringified = this.marshalSymbolToString(data);
+		return this.marshalFromStringToBestGuess(stringified);
 	}
 
 	/**
@@ -447,6 +610,10 @@ export class Marshaller implements IMarshaller {
 		// It might be a boolean.
 		if (primitive === "true") return true;
 		if (primitive === "false") return false;
+
+		if (Marshaller.SYMBOL_REGEX.test(primitive)) {
+			return this.marshalStringToSymbol(primitive);
+		}
 
 		// It might be a number.
 		const toNum = Number.parseFloat(primitive);
@@ -474,6 +641,7 @@ export class Marshaller implements IMarshaller {
 	 * @returns {{}|null}
 	 */
 	private marshalTo<T, U> (data: T, to: Newable<U> | U): {} | null {
+		if (typeof to === "symbol" || to === Symbol) return this.marshalToSymbol(data);
 		if (this.typeDetector.isString(to) || to === String) return this.marshalToString(data);
 		if (data instanceof Set || to === Set) return this.marshalToSet(data);
 		if (Array.isArray(to) || to === Array) return this.marshalToArray(data);
