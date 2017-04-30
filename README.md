@@ -52,6 +52,10 @@ The marshalled version of the input data.
 
 ## Changelog:
 
+**v1.0.5**:
+
+- Fixed a bug where errors could be thrown while attempting to marshal a string using heuristics.
+
 **v1.0.3**:
 
 - Added marshalling to/from `symbol`.

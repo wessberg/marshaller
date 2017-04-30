@@ -633,9 +633,6 @@ export class Marshaller implements IMarshaller {
 			return toNum;
 		}
 
-		// It might be an array
-		if (primitive.startsWith("[") && primitive.endsWith("]")) return JSON.parse(primitive);
-
 		if (data === "null") return null;
 		if (data === "undefined") return undefined;
 		if (data === "NaN") return NaN;
