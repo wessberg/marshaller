@@ -44,13 +44,17 @@ The marshalled version of the input data.
 * [X] Casting from/to `Array`.
 * [X] Casting from/to `symbol`.
 * [ ] Casting from/to `Date`.
-* [ ] Casting from/to `Function`
+* [X] Casting from/to `Function`
 * [ ] Casting from/to `Map`
 * [ ] Casting from/to `WeakSet`
 * [ ] Casting from/to `WeakMap`
 * [ ] Casting from/to `RegExp`
 
 ## Changelog:
+
+**v1.0.6**:
+
+- Added marshalling to/from `function`.
 
 **v1.0.5**:
 
