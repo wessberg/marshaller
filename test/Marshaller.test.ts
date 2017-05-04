@@ -2,7 +2,8 @@ import test from "ava";
 import {Marshaller} from "../src/Marshaller";
 import {TypeDetector} from "@wessberg/typedetector";
 
-const marshaller = new Marshaller(new TypeDetector());
+const typeDetector = new TypeDetector();
+const marshaller = new Marshaller(typeDetector);
 
 test(`'marshal()' string -> object. #1`, t => {
 	const expected = {
@@ -130,6 +131,13 @@ test(`'marshal()' string -> best guess. #1`, t => {
 
 	t.deepEqual<Object|null|undefined>(marshaller.marshal(input), expected);
 });
+
+test(`'marshal()' string -> best guess. #2`, t => {
+	const input = `{"foobar": \`baz\`}`;
+
+	t.true(typeDetector.isObject(marshaller.marshal(input)));
+});
+
 
 test(`'marshal()' object -> string. #1`, t => {
 	const expected = '{"a": 2}';

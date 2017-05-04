@@ -666,29 +666,16 @@ export class Marshaller implements IMarshaller {
 	/**
 	 * Marshals a string into an Object.
 	 * @param {string|String} data
-	 * @param {number} [attempt=0]
 	 * @returns {object}
 	 */
-	private marshalStringToObject (data: string|String, attempt: number = 0): { [key: string]: string } {
+	private marshalStringToObject (data: string|String): { [key: string]: string } {
 		const primitive = data instanceof String ? data.valueOf() : data;
-		try { return JSON.parse(primitive);
-		} catch (e) {
+		const converted = this.attemptStringToObjectConversion(primitive);
+		if (converted != null) return converted;
 
-			if (attempt === 0) {
-				// Try to format the string so it fits the JSON standard.
-				let trimmed = primitive
-					.replace(/([{,:}"\]])([ \t\r\n]*)/g, (_, p1) => `${p1}`)
-					.replace(/([{,])(\w+)(:)/g, (_, p1, p2, p3) => `${p1}"${p2}"${p3}`)
-					.replace(/`([^`]*)`/g, (_, p1) => `"${p1}"`)
-					.trim();
-				if (trimmed.endsWith(";")) trimmed = trimmed.slice(0, trimmed.length - 1);
-				return this.marshalStringToObject(trimmed, ++attempt);
-			}
-
-			const obj: { [key: number]: string } = {};
-			for (let i = 0; i < primitive.length; i++) obj[i] = primitive[i];
-			return obj;
-		}
+		const obj: { [key: number]: string } = {};
+		for (let i = 0; i < primitive.length; i++) obj[i] = primitive[i];
+		return obj;
 	}
 
 	/**
@@ -978,6 +965,9 @@ export class Marshaller implements IMarshaller {
 			return toNum;
 		}
 
+		const asObj = this.attemptStringToObjectConversion(primitive);
+		if (asObj != null) return asObj;
+
 		if (Marshaller.FUNCTION_REGEX_1.test(primitive)) return new Function(`return ${primitive}`)();
 		if (Marshaller.FUNCTION_REGEX_2.test(primitive)) return new Function(`return ${primitive}`)();
 		if (Marshaller.FUNCTION_REGEX_3.test(primitive)) return new Function(`return ${primitive}`)();
@@ -1027,6 +1017,31 @@ export class Marshaller implements IMarshaller {
 		if (endsWithClashingQuote) str += "\`";
 		str += "`";
 		return str;
+	}
+
+	/**
+	 * Attempts to convert a string into a regular object. Returns null if it fails.
+	 * @param {string} primitive
+	 * @param {number} [attempt=0]
+	 * @returns {object|null}
+	 */
+	private attemptStringToObjectConversion (primitive: string, attempt: number = 0): {[key: string]: string}|null {
+		try {
+			return JSON.parse(primitive);
+		} catch (e) {
+
+			if (attempt === 0) {
+				// Try to format the string so it fits the JSON standard.
+				let trimmed = primitive
+					.replace(/([{,:}"\]])([ \t\r\n]*)/g, (_, p1) => `${p1}`)
+					.replace(/([{,])(\w+)(:)/g, (_, p1, p2, p3) => `${p1}"${p2}"${p3}`)
+					.replace(/`([^`]*)`/g, (_, p1) => `"${p1}"`)
+					.trim();
+				if (trimmed.endsWith(";")) trimmed = trimmed.slice(0, trimmed.length - 1);
+				return this.attemptStringToObjectConversion(trimmed, ++attempt);
+			}
+			return null;
+		}
 	}
 
 }
