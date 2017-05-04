@@ -130,3 +130,60 @@ test(`'marshal()' string -> best guess. #1`, t => {
 
 	t.deepEqual<Object|null|undefined>(marshaller.marshal(input), expected);
 });
+
+test(`'marshal()' object -> string. #1`, t => {
+	const expected = '{"a": 2}';
+	const input = {
+		a: 2
+	};
+
+	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, expected), expected);
+});
+
+test(`'marshal()' object -> string. #2`, t => {
+	const expected = '{"a": 2, "b": () => {}}';
+	const input = {
+		a: 2,
+		b: () => {}
+	};
+
+	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, expected), expected);
+});
+
+test(`'marshal()' object -> string. #3`, t => {
+	const expected = '{"c": {"d": `hello sir!`}}';
+	const input = {
+		c: {
+			d: "hello sir!"
+		}
+	};
+
+	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, expected), expected);
+});
+
+test(`'marshal()' object -> string. #4`, t => {
+	const expected = '{"foo": false, "type": {"expression": `hello`}}';
+	const foo = false;
+	const exp = "hello";
+	const input = {
+		foo,
+		type: {
+			expression: exp
+		}
+	};
+
+	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, expected), expected);
+});
+
+test(`'marshal()' string -> object. #1`, t => {
+	const expected = {
+		foo: false,
+		type: {
+			expression: "hello"
+		}
+	};
+
+	const input = '{"foo": false, "type": {"expression": `hello`}}';
+
+	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, expected), expected);
+});

@@ -67,12 +67,46 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * Quotes the given string if needed. It will escape the string if it already starts and/or ends with a clashing quote.
+	 * @param {string} content
+	 * @returns {string}
+	 */
+	private quoteIfNecessary (content: string): string {
+		if (!(typeof content === "string")) return content;
+		const firstChar = content[0];
+		const lastChar = content[content.length - 1];
+		let str = "`";
+		const startsWithClashingQuote = firstChar === "`";
+		const endsWithClashingQuote = lastChar === "`";
+		const startOffset = startsWithClashingQuote ? 1 : 0;
+		const endOffset = endsWithClashingQuote ? 1 : 0;
+		if (startsWithClashingQuote) str += "\`";
+		str += content.slice(startOffset, content.length - endOffset);
+		if (endsWithClashingQuote) str += "\`";
+		str += "`";
+		return str;
+	}
+
+	/**
 	 * Marshals an object into a string.
 	 * @param {object} data
 	 * @returns {string}
 	 */
 	private marshalObjectToString<T> (data: { [key: string]: T }): string {
-		return JSON.stringify(data);
+		let str = "{";
+		const space = " ";
+		const keys = Object.keys(data);
+		keys.forEach((key, index) => {
+			str += `"${key}":${space}`;
+			const value = data[key];
+			const isString = typeof this.marshal(value) === "string";
+			const marshalled = this.marshalToString(value);
+			str += isString ? this.quoteIfNecessary(<string>marshalled) : marshalled;
+			if (index !== keys.length - 1) str += `,${space}`;
+		});
+		str += "}";
+		return str;
+		// return JSON.stringify(data);
 	}
 
 	/**
@@ -531,6 +565,7 @@ export class Marshaller implements IMarshaller {
 				let trimmed = primitive
 					.replace(/([{,:}"\]])([ \t\r\n]*)/g, (_, p1) => `${p1}`)
 					.replace(/([{,])(\w+)(:)/g, (_, p1, p2, p3) => `${p1}"${p2}"${p3}`)
+					.replace(/`([^`]*)`/g, (_, p1) => `"${p1}"`)
 					.trim();
 				if (trimmed.endsWith(";")) trimmed = trimmed.slice(0, trimmed.length - 1);
 				return this.marshalStringToObject(trimmed, ++attempt);

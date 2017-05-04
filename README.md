@@ -52,6 +52,10 @@ The marshalled version of the input data.
 
 ## Changelog:
 
+**v1.0.7**:
+
+- Marshalling objects to string no longer uses JSON.stringify. Rather, it tries to correctly format the object as close to native as possible.
+
 **v1.0.6**:
 
 - Added marshalling to/from `function`.
