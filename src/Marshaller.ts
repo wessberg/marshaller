@@ -27,6 +27,78 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * Marshals a string into null.
+	 * @param {string} _
+	 * @returns {null}
+	 */
+	private marshalStringToNull (_: string|String): null {
+		return null;
+	}
+
+	/**
+	 * Marshals an object into null.
+	 * @param {object} _
+	 * @returns {null}
+	 */
+	private marshalObjectToNull<T> (_: { [key: string]: T }): null {
+		return null;
+	}
+
+	/**
+	 * Marshals a set into null.
+	 * @param {Set<T>} _
+	 * @returns {string}
+	 */
+	private marshalSetToNull<T> (_: Set<T>): null {
+		return null;
+	}
+
+	/**
+	 * Marshals a symbol into null.
+	 * @param {symbol} _
+	 * @returns {null}
+	 */
+	private marshalSymbolToNull (_: symbol): null {
+		return null;
+	}
+
+	/**
+	 * Marshals a boolean into null.
+	 * @param {boolean} _
+	 * @returns {null}
+	 */
+	private marshalBooleanToNull (_: boolean | Boolean): null {
+		return null;
+	}
+
+	/**
+	 * Marshals a number into null.
+	 * @param {number} _
+	 * @returns {null}
+	 */
+	private marshalNumberToNull (_: number | Number): null {
+		return null;
+	}
+
+	/**
+	 * Marshals an array into null.
+	 * @param {T[]} _
+	 * @returns {null}
+	 */
+	private marshalArrayToNull<T> (_: T[]): null {
+		return null;
+	}
+
+	/**
+	 * Marshals a function into null.
+	 * @param {Function} _
+	 * @returns {null}
+	 */
+	private marshalFunctionToNull (_: Function): null {
+		return null;
+	}
+
+	/**
 	 * Marshals a set into a string.
 	 * @param {Set<T>} data
 	 * @returns {string}
@@ -38,12 +110,12 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
-	 * Marshals a set into a function.
-	 * @param {Set<T>} data
-	 * @returns {Function}
+	 * Marshals null into a string.
+	 * @param {null} _
+	 * @returns {string}
 	 */
-	private marshalSetToFunction<T> (data: Set<T>): Function {
-		return () => data;
+	private marshalNullToString (_: null): string {
+		return "null";
 	}
 
 	/**
@@ -55,36 +127,6 @@ export class Marshaller implements IMarshaller {
 		const match = data.toString().match(Marshaller.SYMBOL_REGEX);
 		if (match == null) throw new ReferenceError(`${this.marshalSymbolToString.name} was given an invalid symbol to marshal!`);
 		return match[1];
-	}
-
-	/**
-	 * Marshals a symbol into a function.
-	 * @param {symbol} data
-	 * @returns {Function}
-	 */
-	private marshalSymbolToFunction (data: symbol): Function {
-		return () => data;
-	}
-
-	/**
-	 * Quotes the given string if needed. It will escape the string if it already starts and/or ends with a clashing quote.
-	 * @param {string} content
-	 * @returns {string}
-	 */
-	private quoteIfNecessary (content: string): string {
-		if (!(typeof content === "string")) return content;
-		const firstChar = content[0];
-		const lastChar = content[content.length - 1];
-		let str = "`";
-		const startsWithClashingQuote = firstChar === "`";
-		const endsWithClashingQuote = lastChar === "`";
-		const startOffset = startsWithClashingQuote ? 1 : 0;
-		const endOffset = endsWithClashingQuote ? 1 : 0;
-		if (startsWithClashingQuote) str += "\`";
-		str += content.slice(startOffset, content.length - endOffset);
-		if (endsWithClashingQuote) str += "\`";
-		str += "`";
-		return str;
 	}
 
 	/**
@@ -110,15 +152,6 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
-	 * Marshals an object into a function.
-	 * @param {object} data
-	 * @returns {Function}
-	 */
-	private marshalObjectToFunction<T> (data: { [key: string]: T }): Function {
-		return () => data;
-	}
-
-	/**
 	 * Marshals a boolean into a string.
 	 * @param {boolean} data
 	 * @returns {string}
@@ -128,30 +161,12 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
-	 * Marshals a boolean into a Function.
-	 * @param {boolean} data
-	 * @returns {Function}
-	 */
-	private marshalBooleanToFunction (data: boolean | Boolean): Function {
-		return () => data;
-	}
-
-	/**
 	 * Marshals a number into a string.
 	 * @param {number} data
 	 * @returns {string}
 	 */
 	private marshalNumberToString (data: number | Number): string {
 		return `${data instanceof Number ? data.valueOf() : data}`;
-	}
-
-	/**
-	 * Marshals a number into a Function.
-	 * @param {number} data
-	 * @returns {Function}
-	 */
-	private marshalNumberToFunction (data: number | Number): Function {
-		return () => data;
 	}
 
 	/**
@@ -170,6 +185,60 @@ export class Marshaller implements IMarshaller {
 	 */
 	private marshalFunctionToString (data: Function): string {
 		return data.toString();
+	}
+
+	/**
+	 * Marshals null into a function.
+	 * @param {null} _
+	 * @returns {Function}
+	 */
+	private marshalNullToFunction (_: null): Function {
+		return () => null;
+	}
+
+	/**
+	 * Marshals a set into a function.
+	 * @param {Set<T>} data
+	 * @returns {Function}
+	 */
+	private marshalSetToFunction<T> (data: Set<T>): Function {
+		return () => data;
+	}
+
+	/**
+	 * Marshals a symbol into a function.
+	 * @param {symbol} data
+	 * @returns {Function}
+	 */
+	private marshalSymbolToFunction (data: symbol): Function {
+		return () => data;
+	}
+
+	/**
+	 * Marshals an object into a function.
+	 * @param {object} data
+	 * @returns {Function}
+	 */
+	private marshalObjectToFunction<T> (data: { [key: string]: T }): Function {
+		return () => data;
+	}
+
+	/**
+	 * Marshals a boolean into a Function.
+	 * @param {boolean} data
+	 * @returns {Function}
+	 */
+	private marshalBooleanToFunction (data: boolean | Boolean): Function {
+		return () => data;
+	}
+
+	/**
+	 * Marshals a number into a Function.
+	 * @param {number} data
+	 * @returns {Function}
+	 */
+	private marshalNumberToFunction (data: number | Number): Function {
+		return () => data;
 	}
 
 	/**
@@ -201,6 +270,15 @@ export class Marshaller implements IMarshaller {
 	private marshalStringToBoolean (data: string | String): boolean {
 		const primitive = data instanceof String ? data.valueOf() : data;
 		return primitive === "true" || primitive === "1" || primitive === "";
+	}
+
+	/**
+	 * Marshals null into a boolean.
+	 * @param {null} _
+	 * @returns {boolean}
+	 */
+	private marshalNullToBoolean (_: null): boolean {
+		return false;
 	}
 
 	/**
@@ -276,6 +354,15 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * Marshals a string into a symbol.
+	 * @param {null} _
+	 * @returns {symbol}
+	 */
+	private marshalNullToSymbol (_: null): symbol {
+		return Symbol(this.marshalNullToString(null));
+	}
+
+	/**
 	 * Marshals a number into a symbol.
 	 * @param {number} data
 	 * @returns {symbol}
@@ -339,6 +426,15 @@ export class Marshaller implements IMarshaller {
 	private marshalStringToNumber (data: string | String): number {
 		const primitive = data instanceof String ? data.valueOf() : data;
 		return Number.parseFloat(primitive);
+	}
+
+	/**
+	 * Marshals null into a number.
+	 * @param {null} _
+	 * @returns {number}
+	 */
+	private marshalNullToNumber (_: null): number {
+		return 0;
 	}
 
 	/**
@@ -406,6 +502,15 @@ export class Marshaller implements IMarshaller {
 	private marshalStringToSet (data: string | String): Set<string> {
 		const primitive = data instanceof String ? data.valueOf() : data;
 		return new Set([primitive]);
+	}
+
+	/**
+	 * Marshals null into a Set.
+	 * @param {null} _
+	 * @returns {Set<null>}
+	 */
+	private marshalNullToSet (_: null): Set<null> {
+		return new Set([null]);
 	}
 
 	/**
@@ -478,6 +583,15 @@ export class Marshaller implements IMarshaller {
 		}
 
 		return [primitive];
+	}
+
+	/**
+	 * Marshals null into an Array.
+	 * @param {null} _
+	 * @returns {null[]}
+	 */
+	private marshalNullToArray (_: null): null[] {
+		return [null];
 	}
 
 	/**
@@ -578,6 +692,15 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * Marshals a string into an Object.
+	 * @param {null} _
+	 * @returns {object}
+	 */
+	private marshalNullToObject (_: null): { [key: number]: null } {
+		return {0: null}
+	}
+
+	/**
 	 * Marshals a Function into an Object.
 	 * @param {Function} data
 	 * @returns {object}
@@ -636,6 +759,7 @@ export class Marshaller implements IMarshaller {
 	 */
 	private marshalToBoolean<T> (data: T): boolean | null {
 		if (this.typeDetector.isBoolean(data)) return data;
+		if (data === null) return this.marshalNullToBoolean(data);
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToBoolean(data);
 		if (this.typeDetector.isString(data))  return this.marshalStringToBoolean(data);
 		if (typeof data === "symbol") return this.marshalSymbolToBoolean(data);
@@ -653,6 +777,7 @@ export class Marshaller implements IMarshaller {
 	 */
 	private marshalToNumber<T> (data: T): number | null {
 		if (this.typeDetector.isNumber(data))   return data;
+		if (data === null) return this.marshalNullToNumber(data);
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToNumber(data);
 		if (this.typeDetector.isString(data))  return this.marshalStringToNumber(data);
 		if (typeof data === "symbol") return this.marshalSymbolToNumber(data);
@@ -670,6 +795,7 @@ export class Marshaller implements IMarshaller {
 	 */
 	private marshalToSymbol<T> (data: T): symbol | null {
 		if (typeof data === "symbol") return data;
+		if (data === null) return this.marshalNullToSymbol(data);
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToSymbol(data);
 		if (this.typeDetector.isString(data)) return this.marshalStringToSymbol(data);
 		if (data instanceof Set)      return this.marshalSetToSymbol(data);
@@ -688,6 +814,7 @@ export class Marshaller implements IMarshaller {
 	 */
 	private marshalToString<T> (data: T): string | null {
 		if (this.typeDetector.isString(data)) return (<String>data instanceof String ? <string>data.valueOf() : data);
+		if (data === null) return this.marshalNullToString(data);
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToString(data);
 		if (typeof data === "symbol") return this.marshalSymbolToString(data);
 		if (data instanceof Set)      return this.marshalSetToString(data);
@@ -706,6 +833,7 @@ export class Marshaller implements IMarshaller {
 	 */
 	private marshalToFunction<T> (data: T): Function | null {
 		if (this.typeDetector.isFunction(data)) return data;
+		if (data === null) return this.marshalNullToFunction(data);
 		if (this.typeDetector.isString(data)) return this.marshalStringToFunction(data);
 		if (typeof data === "symbol") return this.marshalSymbolToFunction(data);
 		if (data instanceof Set)      return this.marshalSetToFunction(data);
@@ -720,10 +848,11 @@ export class Marshaller implements IMarshaller {
 	/**
 	 * Marshals the given data, whatever the type, into a Set.
 	 * @param {T} data
-	 * @returns {Set<{}>|null}
+	 * @returns {Set<{}|null>|null}
 	 */
-	private marshalToSet<T> (data: T): Set<{}> | null {
+	private marshalToSet<T> (data: T): Set<{}|null> | null {
 		if (data instanceof Set)      return data;
+		if (data === null) return this.marshalNullToSet(data);
 		if (this.typeDetector.isString(data))   return this.marshalStringToSet(data);
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToSet(data);
 		if (typeof data === "symbol") return this.marshalSymbolToSet(data);
@@ -737,10 +866,11 @@ export class Marshaller implements IMarshaller {
 	/**
 	 * Marshals the given data, whatever the type, into an Array.
 	 * @param {T} data
-	 * @returns {{}[]|null}
+	 * @returns {({}|null)[]|null}
 	 */
-	private marshalToArray<T> (data: T): {}[] | null {
+	private marshalToArray<T> (data: T): ({}|null)[] | null {
 		if (Array.isArray(data))    return data;
+		if (data === null) return this.marshalNullToArray(data);
 		if (this.typeDetector.isString(data))   return this.marshalStringToArray(data);
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToArray(data);
 		if (typeof data === "symbol") return this.marshalSymbolToArray(data);
@@ -754,10 +884,11 @@ export class Marshaller implements IMarshaller {
 	/**
 	 * Marshals the given data, whatever the type, into an Object.
 	 * @param {T} data
-	 * @returns {object|null}
+	 * @returns {IArbitraryObject<{}|null>|null}
 	 */
-	private marshalToObject<T> (data: T): IArbitraryObject<{}>|null {
+	private marshalToObject<T> (data: T): IArbitraryObject<{}|null>|null {
 		if (this.typeDetector.isObject(data))    return data;
+		if (data === null) return this.marshalNullToObject(data);
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToObject(data);
 		if (Array.isArray(data))    return this.marshalArrayToObject(data);
 		if (typeof data === "symbol") return this.marshalSymbolToObject(data);
@@ -766,6 +897,24 @@ export class Marshaller implements IMarshaller {
 		if (this.typeDetector.isBoolean(data))  return this.marshalBooleanToObject(data);
 		if (this.typeDetector.isNumber(data))   return this.marshalNumberToObject(data);
 		return data == null ? null : {};
+	}
+
+	/**
+	 * Marshals the given data, whatever the type, into null.
+	 * @param {T} data
+	 * @returns {null}
+	 */
+	private marshalToNull<T> (data: T): null {
+		if (data == null) return null;
+		if (this.typeDetector.isObject(data))    return this.marshalObjectToNull(data);
+		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToNull(data);
+		if (Array.isArray(data))    return this.marshalArrayToNull(data);
+		if (typeof data === "symbol") return this.marshalSymbolToNull(data);
+		if (this.typeDetector.isString(data))   return this.marshalStringToNull(data);
+		if (data instanceof Set)      return this.marshalSetToNull(data);
+		if (this.typeDetector.isBoolean(data))  return this.marshalBooleanToNull(data);
+		if (this.typeDetector.isNumber(data))   return this.marshalNumberToNull(data);
+		return null;
 	}
 
 	/**
@@ -811,6 +960,10 @@ export class Marshaller implements IMarshaller {
 		// It might be a boolean.
 		if (primitive === "true") return true;
 		if (primitive === "false") return false;
+		if (primitive === "null") return null;
+		if (primitive === "undefined") return undefined;
+		if (primitive === "NaN") return NaN;
+		if (primitive === "Infinity") return Infinity;
 
 		if (Marshaller.SYMBOL_REGEX.test(primitive)) {
 			return this.marshalStringToSymbol(primitive);
@@ -822,11 +975,6 @@ export class Marshaller implements IMarshaller {
 			if (this.startsWithNumberButShouldEnforceString(primitive)) return primitive;
 			return toNum;
 		}
-
-		if (data === "null") return null;
-		if (data === "undefined") return undefined;
-		if (data === "NaN") return NaN;
-		if (data === "Infinity") return Infinity;
 
 		if (Marshaller.FUNCTION_REGEX_1.test(primitive)) return new Function(`return ${primitive}`)();
 		if (Marshaller.FUNCTION_REGEX_2.test(primitive)) return new Function(`return ${primitive}`)();
@@ -846,6 +994,7 @@ export class Marshaller implements IMarshaller {
 	 * @returns {{}|null}
 	 */
 	private marshalTo<T, U> (data: T, to: Newable<U> | U): {} | null {
+		if (typeof to === null) return this.marshalToNull(data);
 		if (typeof to === "symbol" || to === Symbol) return this.marshalToSymbol(data);
 		if (this.typeDetector.isString(to) || to === String) return this.marshalToString(data);
 		if (data instanceof Set || to === Set) return this.marshalToSet(data);
@@ -855,6 +1004,27 @@ export class Marshaller implements IMarshaller {
 		if (this.typeDetector.isNumber(to) || to === Number) return this.marshalToNumber(data);
 		if (this.typeDetector.isFunction(to) || to === <{}>Function) return this.marshalToFunction(data);
 		return this.marshalToString(data);
+	}
+
+	/**
+	 * Quotes the given string if needed. It will escape the string if it already starts and/or ends with a clashing quote.
+	 * @param {string} content
+	 * @returns {string}
+	 */
+	private quoteIfNecessary (content: string): string {
+		if (!(typeof content === "string")) return content;
+		const firstChar = content[0];
+		const lastChar = content[content.length - 1];
+		let str = "`";
+		const startsWithClashingQuote = firstChar === "`";
+		const endsWithClashingQuote = lastChar === "`";
+		const startOffset = startsWithClashingQuote ? 1 : 0;
+		const endOffset = endsWithClashingQuote ? 1 : 0;
+		if (startsWithClashingQuote) str += "\`";
+		str += content.slice(startOffset, content.length - endOffset);
+		if (endsWithClashingQuote) str += "\`";
+		str += "`";
+		return str;
 	}
 
 }

@@ -43,6 +43,7 @@ The marshalled version of the input data.
 * [X] Casting from/to `boolean`.
 * [X] Casting from/to `Array`.
 * [X] Casting from/to `symbol`.
+* [X] Casting from/to `null`.
 * [ ] Casting from/to `Date`.
 * [X] Casting from/to `Function`
 * [ ] Casting from/to `Map`
@@ -51,6 +52,10 @@ The marshalled version of the input data.
 * [ ] Casting from/to `RegExp`
 
 ## Changelog:
+
+**v1.0.8**:
+
+- Added marshalling to/from `null`.
 
 **v1.0.7**:
 
