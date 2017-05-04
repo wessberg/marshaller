@@ -53,6 +53,10 @@ The marshalled version of the input data.
 
 ## Changelog:
 
+**v1.0.9**:
+
+- Moved null checks around to fix bugs.
+
 **v1.0.8**:
 
 - Added marshalling to/from `null`.
