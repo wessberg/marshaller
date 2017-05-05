@@ -7,9 +7,9 @@ import {ITypeDetector, IArbitraryObject} from "@wessberg/typedetector";
  */
 export class Marshaller implements IMarshaller {
 	private static readonly SYMBOL_REGEX: RegExp = /Symbol\(([^)]*)\)/;
-	private static readonly FUNCTION_REGEX_1: RegExp = /function\s*\w*\s*\([^)]*\)\s*{/;
-	private static readonly FUNCTION_REGEX_2: RegExp = /\([^)]*\)\s*=>/;
-	private static readonly FUNCTION_REGEX_3: RegExp = /\w+\s*=>/;
+	private static readonly FUNCTION_REGEX_1: RegExp = /^function\s*\w*\s*\([^)]*\)\s*{/;
+	private static readonly FUNCTION_REGEX_2: RegExp = /^\([^)]*\)\s*=>/;
+	private static readonly FUNCTION_REGEX_3: RegExp = /^\w+\s*=>/;
 
 	constructor (private typeDetector: ITypeDetector) {}
 
@@ -256,9 +256,9 @@ export class Marshaller implements IMarshaller {
 	 * @returns {Function}
 	 */
 	private marshalStringToFunction (data: string): Function {
-		if (Marshaller.FUNCTION_REGEX_1.test(data)) return new Function(`return ${data}`)();
-		if (Marshaller.FUNCTION_REGEX_2.test(data)) return new Function(`return ${data}`)();
-		if (Marshaller.FUNCTION_REGEX_3.test(data)) return new Function(`return ${data}`)();
+		if (Marshaller.FUNCTION_REGEX_1.test(data.trim())) return new Function(`return ${data}`)();
+		if (Marshaller.FUNCTION_REGEX_2.test(data.trim())) return new Function(`return ${data}`)();
+		if (Marshaller.FUNCTION_REGEX_3.test(data.trim())) return new Function(`return ${data}`)();
 		return () => data;
 	}
 
@@ -968,9 +968,9 @@ export class Marshaller implements IMarshaller {
 		const asObj = this.attemptStringToObjectConversion(primitive);
 		if (asObj != null) return asObj;
 
-		if (Marshaller.FUNCTION_REGEX_1.test(primitive)) return new Function(`return ${primitive}`)();
-		if (Marshaller.FUNCTION_REGEX_2.test(primitive)) return new Function(`return ${primitive}`)();
-		if (Marshaller.FUNCTION_REGEX_3.test(primitive)) return new Function(`return ${primitive}`)();
+		if (Marshaller.FUNCTION_REGEX_1.test(primitive.trim())) return new Function(`return ${primitive}`)();
+		if (Marshaller.FUNCTION_REGEX_2.test(primitive.trim())) return new Function(`return ${primitive}`)();
+		if (Marshaller.FUNCTION_REGEX_3.test(primitive.trim())) return new Function(`return ${primitive}`)();
 
 		try {
 			return JSON.parse(primitive);

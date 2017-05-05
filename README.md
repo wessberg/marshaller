@@ -53,6 +53,10 @@ The marshalled version of the input data.
 
 ## Changelog:
 
+**v1.11.0**:
+
+- Fixed a bug with marshalling strings that contains the word "function".
+
 **v1.10.0**:
 
 - The Marshaller can no marshal to objects if that is the most probable type, even if a hint is not given.
