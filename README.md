@@ -53,6 +53,10 @@ The marshalled version of the input data.
 
 ## Changelog:
 
+**v1.13.0**:
+
+- Small fixes to the function regexes.
+
 **v1.12.0**:
 
 - Switched to `new Function()` for marshalling strings to objects.

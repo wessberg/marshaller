@@ -7,8 +7,8 @@ import {ITypeDetector, IArbitraryObject} from "@wessberg/typedetector";
  */
 export class Marshaller implements IMarshaller {
 	private static readonly SYMBOL_REGEX: RegExp = /Symbol\(([^)]*)\)/;
-	private static readonly FUNCTION_REGEX_1: RegExp = /^function\s*\w*\s*\([^)]*\)\s*{/;
-	private static readonly FUNCTION_REGEX_2: RegExp = /^\([^)]*\)\s*=>/;
+	private static readonly FUNCTION_REGEX_1: RegExp = /^\(*function\s*\w*\s*\([^)]*\)\s*{/;
+	private static readonly FUNCTION_REGEX_2: RegExp = /^\(+[^)]*\)\s*=>/;
 	private static readonly FUNCTION_REGEX_3: RegExp = /^\w+\s*=>/;
 
 	constructor (private typeDetector: ITypeDetector) {}
