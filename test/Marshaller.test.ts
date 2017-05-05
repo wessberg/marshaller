@@ -28,18 +28,11 @@ test(`'marshal()' string -> object. #2`, t => {
 				c: "hello world!"
 			}
 		},
-		b: ["foo", "bar", true, false]
+		d: ["foo", "bar", true, false]
 	};
 
 	const input = `
-		{
-		a: {
-			b: {
-				c: "hello world!"
-			}
-		},
-		b: ["foo", "bar", true, false]
-	};
+		{a: {b: {c: "hello world!"}}, d: ["foo", "bar", true, false]}
 	`;
 
 	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, Object), expected);
@@ -172,6 +165,14 @@ test(`'marshal()' string -> best guess. #4`, t => {
 	const marshalled = marshaller.marshal(input);
 	if (marshalled == null) t.fail();
 	else t.deepEqual(marshalled.toString(), expected.toString());
+});
+
+test(`'marshal()' string -> best guess. #5`, t => {
+	const input = `{"hmm": ((arg) => { return (arg === undefined ? undefined : arg)+10;})}`;
+	// const expected = {"hmm": ((_) => { return (_ === undefined ? undefined : _)+10;})};
+
+	const marshalled = marshaller.marshal(input);
+	t.true(typeDetector.isObject(marshalled));
 });
 
 

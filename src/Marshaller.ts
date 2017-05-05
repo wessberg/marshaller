@@ -965,12 +965,12 @@ export class Marshaller implements IMarshaller {
 			return toNum;
 		}
 
-		const asObj = this.attemptStringToObjectConversion(primitive);
-		if (asObj != null) return asObj;
-
 		if (Marshaller.FUNCTION_REGEX_1.test(primitive.trim())) return new Function(`return ${primitive}`)();
 		if (Marshaller.FUNCTION_REGEX_2.test(primitive.trim())) return new Function(`return ${primitive}`)();
 		if (Marshaller.FUNCTION_REGEX_3.test(primitive.trim())) return new Function(`return ${primitive}`)();
+
+		const asObj = this.attemptStringToObjectConversion(primitive);
+		if (asObj != null) return asObj;
 
 		try {
 			return JSON.parse(primitive);
@@ -1022,25 +1022,19 @@ export class Marshaller implements IMarshaller {
 	/**
 	 * Attempts to convert a string into a regular object. Returns null if it fails.
 	 * @param {string} primitive
-	 * @param {number} [attempt=0]
 	 * @returns {object|null}
 	 */
-	private attemptStringToObjectConversion (primitive: string, attempt: number = 0): {[key: string]: string}|null {
+	private attemptStringToObjectConversion (primitive: string): {[key: string]: string}|null {
 		try {
 			return JSON.parse(primitive);
 		} catch (e) {
-
-			if (attempt === 0) {
-				// Try to format the string so it fits the JSON standard.
-				let trimmed = primitive
-					.replace(/([{,:}"\]])([ \t\r\n]*)/g, (_, p1) => `${p1}`)
-					.replace(/([{,])(\w+)(:)/g, (_, p1, p2, p3) => `${p1}"${p2}"${p3}`)
-					.replace(/`([^`]*)`/g, (_, p1) => `"${p1}"`)
-					.trim();
-				if (trimmed.endsWith(";")) trimmed = trimmed.slice(0, trimmed.length - 1);
-				return this.attemptStringToObjectConversion(trimmed, ++attempt);
+			try {
+				const evaluated = new Function(`return (${primitive})`)();
+				if (this.typeDetector.isObject(evaluated)) return <{[key: string]: string}>evaluated;
+				return null;
+			} catch (e) {
+				return null;
 			}
-			return null;
 		}
 	}
 

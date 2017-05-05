@@ -53,6 +53,10 @@ The marshalled version of the input data.
 
 ## Changelog:
 
+**v1.12.0**:
+
+- Switched to `new Function()` for marshalling strings to objects.
+
 **v1.11.0**:
 
 - Fixed a bug with marshalling strings that contains the word "function".
