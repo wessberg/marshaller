@@ -53,23 +53,27 @@ The marshalled version of the input data.
 
 ## Changelog:
 
-**v1.14.0**:
+**v1.0.16**:
+
+- Bumped `typedecetor` dependency.
+
+**v1.0.14**:
 
 - Added a proxy for the `getTypeOf` method of the dependent `typeDetector` library.
 
-**v1.13.0**:
+**v1.0.13**:
 
 - Small fixes to the function regexes.
 
-**v1.12.0**:
+**v1.0.12**:
 
 - Switched to `new Function()` for marshalling strings to objects.
 
-**v1.11.0**:
+**v1.0.11**:
 
 - Fixed a bug with marshalling strings that contains the word "function".
 
-**v1.10.0**:
+**v1.0.10**:
 
 - The Marshaller can no marshal to objects if that is the most probable type, even if a hint is not given.
 

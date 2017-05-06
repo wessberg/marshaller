@@ -28,6 +28,6 @@
     "typescript": "2.3.0"
   },
   "dependencies": {
-    "@wessberg/typedetector": "^1.0.0"
+    "@wessberg/typedetector": "^1.0.4"
   }
 }
