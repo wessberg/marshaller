@@ -53,6 +53,10 @@ The marshalled version of the input data.
 
 ## Changelog:
 
+**v1.14.0**:
+
+- Added a proxy for the `getTypeOf` method of the dependent `typeDetector` library.
+
 **v1.13.0**:
 
 - Small fixes to the function regexes.

@@ -1,5 +1,5 @@
 import {IMarshaller, Newable} from "./interface/IMarshaller";
-import {ITypeDetector, IArbitraryObject} from "@wessberg/typedetector";
+import {ITypeDetector, IArbitraryObject, TypeOf} from "@wessberg/typedetector";
 
 /**
  * A class that maps between a variety of data types.
@@ -24,6 +24,15 @@ export class Marshaller implements IMarshaller {
 	public marshal<T, U> (data: T, hint?: U|Newable<U>): U | null|undefined {
 		if (hint != null) return <U | null>this.marshalTo(data, hint);
 		else return <U | null>this.marshalToBestGuess<T>(data);
+	}
+
+	/**
+	 * A proxy for the 'getTypeOf' operation of the typeDetector.
+	 * @param {T} data
+	 * @returns {TypeOf}
+	 */
+	public getTypeOf<T> (data: T): TypeOf {
+		return this.typeDetector.getTypeof(data);
 	}
 
 	/**
@@ -989,7 +998,7 @@ export class Marshaller implements IMarshaller {
 		if (typeof to === null) return this.marshalToNull(data);
 		if (typeof to === "symbol" || to === Symbol) return this.marshalToSymbol(data);
 		if (this.typeDetector.isString(to) || to === String) return this.marshalToString(data);
-		if (data instanceof Set || to === Set) return this.marshalToSet(data);
+		if (to instanceof Set || to === Set) return this.marshalToSet(data);
 		if (Array.isArray(to) || to === Array) return this.marshalToArray(data);
 		if (this.typeDetector.isObject(to) || to === Object) return this.marshalToObject(data);
 		if (this.typeDetector.isBoolean(to) || to === Boolean) return this.marshalToBoolean(data);
