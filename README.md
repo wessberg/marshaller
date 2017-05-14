@@ -44,6 +44,7 @@ The marshalled version of the input data.
 * [X] Casting from/to `Array`.
 * [X] Casting from/to `symbol`.
 * [X] Casting from/to `null`.
+* [X] Casting from/to `undefined`.
 * [ ] Casting from/to `Date`.
 * [X] Casting from/to `Function`
 * [ ] Casting from/to `Map`
@@ -52,6 +53,10 @@ The marshalled version of the input data.
 * [ ] Casting from/to `RegExp`
 
 ## Changelog:
+
+**v1.0.17**:
+
+- Corrected some issues with marshalling to/from `undefined`.
 
 **v1.0.16**:
 
