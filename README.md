@@ -54,6 +54,10 @@ The marshalled version of the input data.
 
 ## Changelog:
 
+**v1.0.18**:
+
+- Improved stringifying functions inside object literals.
+
 **v1.0.17**:
 
 - Corrected some issues with marshalling to/from `undefined`.

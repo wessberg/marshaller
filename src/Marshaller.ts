@@ -170,7 +170,11 @@ export class Marshaller implements IMarshaller {
 			const value = data[key];
 			const isString = typeof this.marshal(value) === 'string';
 			const marshalled = this.marshalToString(value);
-			str += isString ? this.quoteIfNecessary(<string>marshalled) : marshalled;
+			const isFunction = this.typeDetector.isFunction(value);
+
+			if (isString) str += this.quoteIfNecessary(<string>marshalled);
+			else if (isFunction) str += this.formatObjectLiteralFunction(<string>marshalled);
+			else str += marshalled;
 			if (index !== keys.length - 1) str += `,${space}`;
 		});
 		str += '}';
@@ -1137,6 +1141,38 @@ export class Marshaller implements IMarshaller {
 				return null;
 			}
 		}
+	}
+
+	/**
+	 * Returns true if the given string is an arrow function.
+	 * @param {string} str
+	 * @returns {boolean}
+	 */
+	private isArrowFunction (str: string): boolean {
+		if (this.getTypeOf(this.marshal(str)) !== "function") return false;
+		const trimmed = str.trim();
+		return !this.functionHasFunctionKeyword(str) && trimmed.includes("=>");
+	}
+
+	/**
+	 * Returns true if the given stringified function starts with the "function" keyword.
+	 * @param {string} str
+	 * @returns {boolean}
+	 */
+	private functionHasFunctionKeyword (str: string): boolean {
+		const trimmed = str.trim();
+		return trimmed.startsWith("function");
+	}
+
+	/**
+	 * Formats an object so it fits a reconstructed object literal from a string.
+	 * @param {string} str
+	 * @returns {string}
+	 */
+	private formatObjectLiteralFunction (str: string): string {
+		if (this.isArrowFunction(str)) return str;
+		if (this.functionHasFunctionKeyword(str)) return str;
+		return `function ${str}`;
 	}
 
 }

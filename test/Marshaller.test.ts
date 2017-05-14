@@ -158,7 +158,7 @@ test(`'marshal()' string -> best guess. #5`, t => {
 	else t.deepEqual(marshalled.toString(), expected.toString());
 });
 
-test(`'marshal()' string -> best guess. #4`, t => {
+test(`'marshal()' string -> best guess. #6`, t => {
 	const input = `hello() => {}`;
 	const expected = input;
 
@@ -167,14 +167,12 @@ test(`'marshal()' string -> best guess. #4`, t => {
 	else t.deepEqual(marshalled.toString(), expected.toString());
 });
 
-test(`'marshal()' string -> best guess. #5`, t => {
+test(`'marshal()' string -> best guess. #7`, t => {
 	const input = `{"hmm": ((arg) => { return (arg === undefined ? undefined : arg)+10;})}`;
-	// const expected = {"hmm": ((_) => { return (_ === undefined ? undefined : _)+10;})};
 
 	const marshalled = marshaller.marshal(input);
 	t.true(typeDetector.isObject(marshalled));
 });
-
 
 test(`'marshal()' object -> string. #1`, t => {
 	const expected = '{"a": 2}';
