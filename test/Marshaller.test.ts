@@ -1,6 +1,7 @@
 import test from "ava";
 import {Marshaller} from "../src/Marshaller";
 import {TypeDetector} from "@wessberg/typedetector";
+import {GlobalObject, GlobalObjectIdentifier} from "@wessberg/globalobject";
 
 const typeDetector = new TypeDetector();
 const marshaller = new Marshaller(typeDetector);
@@ -174,6 +175,13 @@ test(`'marshal()' string -> best guess. #7`, t => {
 	t.true(typeDetector.isObject(marshalled));
 });
 
+test(`'marshal()' string -> best guess. #8`, t => {
+	const input = `{"global": ${GlobalObjectIdentifier}}`;
+
+	const marshalled = marshaller.marshal(input);
+	t.true(typeDetector.isObject(marshalled));
+});
+
 test(`'marshal()' object -> string. #1`, t => {
 	const expected = '{"a": 2}';
 	const input = {
@@ -225,6 +233,27 @@ test(`'marshal()' object -> string. #5`, t => {
 	};
 
 	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, expected), expected);
+});
+
+test(`'marshal()' object -> string. #6`, t => {
+	const expected = '{"foo": Foo}';
+	class Foo {}
+	const input = {
+		"foo": Foo
+	};
+
+	const marshalled = marshaller.marshal(input, expected);
+	t.deepEqual(marshalled, expected);
+});
+
+test(`'marshal()' object -> string. #7`, t => {
+	const expected = `{"global": ${GlobalObjectIdentifier}}`;
+	const input = {
+		"global": GlobalObject
+	};
+
+	const marshalled = marshaller.marshal(input, expected);
+	t.deepEqual(marshalled, expected);
 });
 
 test(`'marshal()' string -> object. #1`, t => {

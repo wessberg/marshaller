@@ -54,6 +54,10 @@ The marshalled version of the input data.
 
 ## Changelog:
 
+**v1.0.19**:
+
+- Corrected issues with marshalling global/window/self/root.
+
 **v1.0.18**:
 
 - Improved stringifying functions inside object literals.

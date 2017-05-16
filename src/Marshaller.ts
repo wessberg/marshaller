@@ -1,5 +1,6 @@
-import {IArbitraryObject, ITypeDetector, TypeOf} from '@wessberg/typedetector';
-import {IMarshaller, Newable} from './interface/IMarshaller';
+import {IArbitraryObject, ITypeDetector, TypeOf} from "@wessberg/typedetector";
+import {IMarshaller, Newable} from "./interface/IMarshaller";
+import {GlobalObject, GlobalObjectIdentifier} from "@wessberg/globalobject";
 
 /**
  * A class that maps between a variety of data types.
@@ -11,7 +12,8 @@ export class Marshaller implements IMarshaller {
 	private static readonly FUNCTION_REGEX_2: RegExp = /^\(+[^)]*\)\s*=>/;
 	private static readonly FUNCTION_REGEX_3: RegExp = /^\w+\s*=>/;
 
-	constructor (private typeDetector: ITypeDetector) {}
+	constructor (private typeDetector: ITypeDetector) {
+	}
 
 	/**
 	 * Takes some data and marshals it into the other data-type given as hint.
@@ -21,9 +23,9 @@ export class Marshaller implements IMarshaller {
 	 * @param {U} [hint]
 	 * @returns {null|U}
 	 */
-	public marshal<T, U> (data: T, hint?: U | Newable<U>): U | null | undefined {
-		if (hint != null) return <U | null>this.marshalTo(data, hint);
-		else return <U | null>this.marshalToBestGuess<T>(data);
+	public marshal<T, U> (data: T, hint?: U|Newable<U>): U|null|undefined {
+		if (hint != null) return <U|null>this.marshalTo(data, hint);
+		else return <U|null>this.marshalToBestGuess<T>(data);
 	}
 
 	/**
@@ -40,7 +42,7 @@ export class Marshaller implements IMarshaller {
 	 * @param {string} _
 	 * @returns {null}
 	 */
-	private marshalStringToNull (_: string | String): null {
+	private marshalStringToNull (_: string|String): null {
 		return null;
 	}
 
@@ -85,7 +87,7 @@ export class Marshaller implements IMarshaller {
 	 * @param {boolean} _
 	 * @returns {null}
 	 */
-	private marshalBooleanToNull (_: boolean | Boolean): null {
+	private marshalBooleanToNull (_: boolean|Boolean): null {
 		return null;
 	}
 
@@ -94,7 +96,7 @@ export class Marshaller implements IMarshaller {
 	 * @param {number} _
 	 * @returns {null}
 	 */
-	private marshalNumberToNull (_: number | Number): null {
+	private marshalNumberToNull (_: number|Number): null {
 		return null;
 	}
 
@@ -122,8 +124,8 @@ export class Marshaller implements IMarshaller {
 	 * @returns {string}
 	 */
 	private marshalSetToString<T> (data: Set<T>): string {
-		let representation = '';
-		data.forEach(entry => representation += JSON.stringify(entry, null, '\t'));
+		let representation = "";
+		data.forEach(entry => representation += JSON.stringify(entry, null, "\t"));
 		return representation;
 	}
 
@@ -133,7 +135,7 @@ export class Marshaller implements IMarshaller {
 	 * @returns {string}
 	 */
 	private marshalUndefinedToString (_: undefined): string {
-		return 'undefined';
+		return "undefined";
 	}
 
 	/**
@@ -142,7 +144,7 @@ export class Marshaller implements IMarshaller {
 	 * @returns {string}
 	 */
 	private marshalNullToString (_: null): string {
-		return 'null';
+		return "null";
 	}
 
 	/**
@@ -162,22 +164,22 @@ export class Marshaller implements IMarshaller {
 	 * @returns {string}
 	 */
 	private marshalObjectToString<T> (data: { [key: string]: T }): string {
-		let str = '{';
-		const space = ' ';
+		let str = "{";
+		const space = " ";
 		const keys = Object.keys(data);
 		keys.forEach((key, index) => {
 			str += `"${key}":${space}`;
 			const value = data[key];
-			const isString = typeof this.marshal(value) === 'string';
+			const isString = typeof this.marshal(value) === "string";
 			const marshalled = this.marshalToString(value);
 			const isFunction = this.typeDetector.isFunction(value);
 
-			if (isString) str += this.quoteIfNecessary(<string>marshalled);
-			else if (isFunction) str += this.formatObjectLiteralFunction(<string>marshalled);
+			if (isFunction) str += this.formatObjectLiteralFunction(<string>marshalled);
+			else if (isString) str += this.quoteIfNecessary(<string>marshalled);
 			else str += marshalled;
 			if (index !== keys.length - 1) str += `,${space}`;
 		});
-		str += '}';
+		str += "}";
 		return str;
 	}
 
@@ -186,7 +188,7 @@ export class Marshaller implements IMarshaller {
 	 * @param {boolean} data
 	 * @returns {string}
 	 */
-	private marshalBooleanToString (data: boolean | Boolean): string {
+	private marshalBooleanToString (data: boolean|Boolean): string {
 		return `${data instanceof Boolean ? data.valueOf() : data}`;
 	}
 
@@ -195,7 +197,7 @@ export class Marshaller implements IMarshaller {
 	 * @param {number} data
 	 * @returns {string}
 	 */
-	private marshalNumberToString (data: number | Number): string {
+	private marshalNumberToString (data: number|Number): string {
 		return `${data instanceof Number ? data.valueOf() : data}`;
 	}
 
@@ -267,7 +269,7 @@ export class Marshaller implements IMarshaller {
 	 * @param {boolean} data
 	 * @returns {Function}
 	 */
-	private marshalBooleanToFunction (data: boolean | Boolean): Function {
+	private marshalBooleanToFunction (data: boolean|Boolean): Function {
 		return () => data;
 	}
 
@@ -276,7 +278,7 @@ export class Marshaller implements IMarshaller {
 	 * @param {number} data
 	 * @returns {Function}
 	 */
-	private marshalNumberToFunction (data: number | Number): Function {
+	private marshalNumberToFunction (data: number|Number): Function {
 		return () => data;
 	}
 
@@ -306,9 +308,9 @@ export class Marshaller implements IMarshaller {
 	 * @param {string} data
 	 * @returns {boolean}
 	 */
-	private marshalStringToBoolean (data: string | String): boolean {
+	private marshalStringToBoolean (data: string|String): boolean {
 		const primitive = data instanceof String ? data.valueOf() : data;
-		return primitive === 'true' || primitive === '1' || primitive === '';
+		return primitive === "true" || primitive === "1" || primitive === "";
 	}
 
 	/**
@@ -381,7 +383,7 @@ export class Marshaller implements IMarshaller {
 	 * @param {number} data
 	 * @returns {boolean}
 	 */
-	private marshalNumberToBoolean (data: number | Number): boolean {
+	private marshalNumberToBoolean (data: number|Number): boolean {
 		const primitive = data instanceof Number ? data.valueOf() : data;
 		return primitive > 0;
 	}
@@ -391,7 +393,7 @@ export class Marshaller implements IMarshaller {
 	 * @param {string} data
 	 * @returns {symbol}
 	 */
-	private marshalStringToSymbol (data: string | String): symbol {
+	private marshalStringToSymbol (data: string|String): symbol {
 		const primitive = data instanceof String ? data.valueOf() : data;
 
 		if (Marshaller.SYMBOL_REGEX.test(primitive)) {
@@ -424,7 +426,7 @@ export class Marshaller implements IMarshaller {
 	 * @param {number} data
 	 * @returns {symbol}
 	 */
-	private marshalNumberToSymbol (data: number | Number): symbol {
+	private marshalNumberToSymbol (data: number|Number): symbol {
 		const primitive = data instanceof Number ? data.valueOf() : data;
 		return Symbol(this.marshalNumberToString(primitive));
 	}
@@ -470,7 +472,7 @@ export class Marshaller implements IMarshaller {
 	 * @param {boolean} data
 	 * @returns {symbol}
 	 */
-	private marshalBooleanToSymbol (data: boolean | Boolean): symbol {
+	private marshalBooleanToSymbol (data: boolean|Boolean): symbol {
 		const primitive = data instanceof Boolean ? data.valueOf() : data;
 		return Symbol(this.marshalBooleanToString(primitive));
 	}
@@ -480,7 +482,7 @@ export class Marshaller implements IMarshaller {
 	 * @param {string} data
 	 * @returns {number}
 	 */
-	private marshalStringToNumber (data: string | String): number {
+	private marshalStringToNumber (data: string|String): number {
 		const primitive = data instanceof String ? data.valueOf() : data;
 		return Number.parseFloat(primitive);
 	}
@@ -555,7 +557,7 @@ export class Marshaller implements IMarshaller {
 	 * @param {boolean} data
 	 * @returns {number}
 	 */
-	private marshalBooleanToNumber (data: boolean | Boolean): number {
+	private marshalBooleanToNumber (data: boolean|Boolean): number {
 		const primitive = data instanceof Boolean ? data.valueOf() : data;
 		return primitive ? 1 : 0;
 	}
@@ -565,7 +567,7 @@ export class Marshaller implements IMarshaller {
 	 * @param {string} data
 	 * @returns {Set<string>}
 	 */
-	private marshalStringToSet (data: string | String): Set<string> {
+	private marshalStringToSet (data: string|String): Set<string> {
 		const primitive = data instanceof String ? data.valueOf() : data;
 		return new Set([primitive]);
 	}
@@ -629,7 +631,7 @@ export class Marshaller implements IMarshaller {
 	 * @param {boolean} data
 	 * @returns {Set<boolean>}
 	 */
-	private marshalBooleanToSet (data: boolean | Boolean): Set<boolean> {
+	private marshalBooleanToSet (data: boolean|Boolean): Set<boolean> {
 		const primitive = data instanceof Boolean ? data.valueOf() : data;
 		return new Set([primitive]);
 	}
@@ -639,7 +641,7 @@ export class Marshaller implements IMarshaller {
 	 * @param {number} data
 	 * @returns {Set<number>}
 	 */
-	private marshalNumberToSet (data: number | Number): Set<number> {
+	private marshalNumberToSet (data: number|Number): Set<number> {
 		const primitive = data instanceof Number ? data.valueOf() : data;
 		return new Set([primitive]);
 	}
@@ -649,11 +651,11 @@ export class Marshaller implements IMarshaller {
 	 * @param {string} data
 	 * @returns {string[]}
 	 */
-	private marshalStringToArray (data: string | String): string[] {
+	private marshalStringToArray (data: string|String): string[] {
 		const primitive = data instanceof String ? data.valueOf() : data;
 		try {
 			// It might be a stringified array.
-			if (data.startsWith('[') && data.endsWith(']')) return JSON.parse(primitive);
+			if (data.startsWith("[") && data.endsWith("]")) return JSON.parse(primitive);
 		} catch (e) {
 		}
 
@@ -721,7 +723,7 @@ export class Marshaller implements IMarshaller {
 	 * @param {boolean} data
 	 * @returns {boolean[]}
 	 */
-	private marshalBooleanToArray (data: boolean | Boolean): boolean[] {
+	private marshalBooleanToArray (data: boolean|Boolean): boolean[] {
 		const primitive = data instanceof Boolean ? data.valueOf() : data;
 		return [primitive];
 	}
@@ -731,7 +733,7 @@ export class Marshaller implements IMarshaller {
 	 * @param {number} data
 	 * @returns {number[]}
 	 */
-	private marshalNumberToArray (data: number | Number): number[] {
+	private marshalNumberToArray (data: number|Number): number[] {
 		const primitive = data instanceof Number ? data.valueOf() : data;
 		return [primitive];
 	}
@@ -752,7 +754,7 @@ export class Marshaller implements IMarshaller {
 	 * @param {string|String} data
 	 * @returns {object}
 	 */
-	private marshalStringToObject (data: string | String): { [key: string]: string } {
+	private marshalStringToObject (data: string|String): { [key: string]: string } {
 		const primitive = data instanceof String ? data.valueOf() : data;
 		const converted = this.attemptStringToObjectConversion(primitive);
 		if (converted != null) return converted;
@@ -817,7 +819,7 @@ export class Marshaller implements IMarshaller {
 	 * @param {boolean} data
 	 * @returns {object}
 	 */
-	private marshalBooleanToObject (data: boolean | Boolean): { 0: boolean } {
+	private marshalBooleanToObject (data: boolean|Boolean): { 0: boolean } {
 		const primitive = data instanceof Boolean ? data.valueOf() : data;
 		return {0: primitive};
 	}
@@ -827,7 +829,7 @@ export class Marshaller implements IMarshaller {
 	 * @param {number} data
 	 * @returns {object}
 	 */
-	private marshalNumberToObject (data: number | Number): { [key: number]: number } {
+	private marshalNumberToObject (data: number|Number): { [key: number]: number } {
 		const primitive = data instanceof Number ? data.valueOf() : data;
 		return {0: primitive};
 	}
@@ -837,13 +839,13 @@ export class Marshaller implements IMarshaller {
 	 * @param {T} data
 	 * @returns {boolean|null}
 	 */
-	private marshalToBoolean<T> (data: T): boolean | null {
+	private marshalToBoolean<T> (data: T): boolean|null {
 		if (data === undefined) return this.marshalUndefinedToBoolean(data);
 		if (data === null) return this.marshalNullToBoolean(data);
 		if (this.typeDetector.isBoolean(data)) return data;
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToBoolean(data);
 		if (this.typeDetector.isString(data))  return this.marshalStringToBoolean(data);
-		if (typeof data === 'symbol') return this.marshalSymbolToBoolean(data);
+		if (typeof data === "symbol") return this.marshalSymbolToBoolean(data);
 		if (data instanceof Set)     return this.marshalSetToBoolean(data);
 		if (Array.isArray(data))   return this.marshalArrayToBoolean(data);
 		if (this.typeDetector.isObject(data))  return this.marshalObjectToBoolean(data);
@@ -856,13 +858,13 @@ export class Marshaller implements IMarshaller {
 	 * @param {T} data
 	 * @returns {number|null}
 	 */
-	private marshalToNumber<T> (data: T): number | null {
+	private marshalToNumber<T> (data: T): number|null {
 		if (data === undefined) return this.marshalUndefinedToNumber(data);
 		if (data === null) return this.marshalNullToNumber(data);
 		if (this.typeDetector.isNumber(data))   return data;
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToNumber(data);
 		if (this.typeDetector.isString(data))  return this.marshalStringToNumber(data);
-		if (typeof data === 'symbol') return this.marshalSymbolToNumber(data);
+		if (typeof data === "symbol") return this.marshalSymbolToNumber(data);
 		if (data instanceof Set)     return this.marshalSetToNumber(data);
 		if (Array.isArray(data))   return this.marshalArrayToNumber(data);
 		if (this.typeDetector.isObject(data))  return this.marshalObjectToNumber(data);
@@ -875,10 +877,10 @@ export class Marshaller implements IMarshaller {
 	 * @param {T} data
 	 * @returns {symbol|null}
 	 */
-	private marshalToSymbol<T> (data: T): symbol | null {
+	private marshalToSymbol<T> (data: T): symbol|null {
 		if (data === undefined) return this.marshalUndefinedToSymbol(data);
 		if (data === null) return this.marshalNullToSymbol(data);
-		if (typeof data === 'symbol') return data;
+		if (typeof data === "symbol") return data;
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToSymbol(data);
 		if (this.typeDetector.isString(data)) return this.marshalStringToSymbol(data);
 		if (data instanceof Set)      return this.marshalSetToSymbol(data);
@@ -895,12 +897,13 @@ export class Marshaller implements IMarshaller {
 	 * @param {T} data
 	 * @returns {string|null}
 	 */
-	private marshalToString<T> (data: T): string | null {
+	private marshalToString<T> (data: T): string|null {
+		if (<{}>data === GlobalObject) return GlobalObjectIdentifier;
 		if (data === undefined) return this.marshalUndefinedToString(data);
 		if (data === null) return this.marshalNullToString(data);
 		if (this.typeDetector.isString(data)) return (<String>data instanceof String ? <string>data.valueOf() : data);
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToString(data);
-		if (typeof data === 'symbol') return this.marshalSymbolToString(data);
+		if (typeof data === "symbol") return this.marshalSymbolToString(data);
 		if (data instanceof Set)      return this.marshalSetToString(data);
 		if (Array.isArray(data))    return this.marshalArrayToString(data);
 		if (this.typeDetector.isObject(data))  return this.marshalObjectToString(data);
@@ -915,12 +918,12 @@ export class Marshaller implements IMarshaller {
 	 * @param {T} data
 	 * @returns {Function|null}
 	 */
-	private marshalToFunction<T> (data: T): Function | null {
+	private marshalToFunction<T> (data: T): Function|null {
 		if (data === undefined) return this.marshalUndefinedToFunction(data);
 		if (data === null) return this.marshalNullToFunction(data);
 		if (this.typeDetector.isFunction(data)) return data;
 		if (this.typeDetector.isString(data)) return this.marshalStringToFunction(data);
-		if (typeof data === 'symbol') return this.marshalSymbolToFunction(data);
+		if (typeof data === "symbol") return this.marshalSymbolToFunction(data);
 		if (data instanceof Set)      return this.marshalSetToFunction(data);
 		if (Array.isArray(data))    return this.marshalArrayToFunction(data);
 		if (this.typeDetector.isObject(data))  return this.marshalObjectToFunction(data);
@@ -935,13 +938,13 @@ export class Marshaller implements IMarshaller {
 	 * @param {T} data
 	 * @returns {Set<{}|null|?>|null}
 	 */
-	private marshalToSet<T> (data: T): Set<{} | null | undefined> | null {
+	private marshalToSet<T> (data: T): Set<{}|null|undefined>|null {
 		if (data === undefined) return this.marshalUndefinedToSet(data);
 		if (data === null) return this.marshalNullToSet(data);
 		if (data instanceof Set)      return data;
 		if (this.typeDetector.isString(data))   return this.marshalStringToSet(data);
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToSet(data);
-		if (typeof data === 'symbol') return this.marshalSymbolToSet(data);
+		if (typeof data === "symbol") return this.marshalSymbolToSet(data);
 		if (Array.isArray(data))    return this.marshalArrayToSet(data);
 		if (this.typeDetector.isObject(data))    return this.marshalObjectToSet(data);
 		if (this.typeDetector.isBoolean(data))  return this.marshalBooleanToSet(data);
@@ -954,13 +957,13 @@ export class Marshaller implements IMarshaller {
 	 * @param {T} data
 	 * @returns {({}|null|?)[]|null}
 	 */
-	private marshalToArray<T> (data: T): ({} | null | undefined)[] | null {
+	private marshalToArray<T> (data: T): ({}|null|undefined)[]|null {
 		if (data === undefined) return this.marshalUndefinedToArray(data);
 		if (data === null) return this.marshalNullToArray(data);
 		if (Array.isArray(data))    return data;
 		if (this.typeDetector.isString(data))   return this.marshalStringToArray(data);
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToArray(data);
-		if (typeof data === 'symbol') return this.marshalSymbolToArray(data);
+		if (typeof data === "symbol") return this.marshalSymbolToArray(data);
 		if (data instanceof Set)      return this.marshalSetToArray(data);
 		if (this.typeDetector.isObject(data))    return this.marshalObjectToArray(data);
 		if (this.typeDetector.isBoolean(data))  return this.marshalBooleanToArray(data);
@@ -973,13 +976,13 @@ export class Marshaller implements IMarshaller {
 	 * @param {T} data
 	 * @returns {IArbitraryObject<{}|null|?>|null}
 	 */
-	private marshalToObject<T> (data: T): IArbitraryObject<{} | null | undefined> | null {
+	private marshalToObject<T> (data: T): IArbitraryObject<{}|null|undefined>|null {
 		if (data === undefined) return this.marshalUndefinedToObject(data);
 		if (data === null) return this.marshalNullToObject(data);
 		if (this.typeDetector.isObject(data))    return data;
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToObject(data);
 		if (Array.isArray(data))    return this.marshalArrayToObject(data);
-		if (typeof data === 'symbol') return this.marshalSymbolToObject(data);
+		if (typeof data === "symbol") return this.marshalSymbolToObject(data);
 		if (this.typeDetector.isString(data))   return this.marshalStringToObject(data);
 		if (data instanceof Set)      return this.marshalSetToObject(data);
 		if (this.typeDetector.isBoolean(data))  return this.marshalBooleanToObject(data);
@@ -998,7 +1001,7 @@ export class Marshaller implements IMarshaller {
 		if (this.typeDetector.isObject(data))    return this.marshalObjectToNull(data);
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToNull(data);
 		if (Array.isArray(data))    return this.marshalArrayToNull(data);
-		if (typeof data === 'symbol') return this.marshalSymbolToNull(data);
+		if (typeof data === "symbol") return this.marshalSymbolToNull(data);
 		if (this.typeDetector.isString(data))   return this.marshalStringToNull(data);
 		if (data instanceof Set)      return this.marshalSetToNull(data);
 		if (this.typeDetector.isBoolean(data))  return this.marshalBooleanToNull(data);
@@ -1011,11 +1014,11 @@ export class Marshaller implements IMarshaller {
 	 * @param {T} data
 	 * @returns {object|null}
 	 */
-	private marshalToBestGuess<T> (data: T): {} | null | undefined {
+	private marshalToBestGuess<T> (data: T): {}|null|undefined {
 		if (data === undefined) return undefined;
 		if (data === null) return null;
 		if (this.typeDetector.isString(data)) return this.marshalFromStringToBestGuess(data);
-		if (typeof data === 'symbol') return this.marshalFromSymbolToBestGuess(data);
+		if (typeof data === "symbol") return this.marshalFromSymbolToBestGuess(data);
 		return data;
 	}
 
@@ -1024,7 +1027,7 @@ export class Marshaller implements IMarshaller {
 	 * @param {symbol} data
 	 * @returns {{}|null}
 	 */
-	private marshalFromSymbolToBestGuess (data: symbol): {} | null | undefined {
+	private marshalFromSymbolToBestGuess (data: symbol): {}|null|undefined {
 		const stringified = this.marshalSymbolToString(data);
 		return this.marshalFromStringToBestGuess(stringified);
 	}
@@ -1045,19 +1048,19 @@ export class Marshaller implements IMarshaller {
 	 * @param {string} data
 	 * @returns {{}|null}
 	 */
-	private marshalFromStringToBestGuess (data: string | String): {} | null | undefined {
+	private marshalFromStringToBestGuess (data: string|String): {}|null|undefined {
 		if (data === undefined) return undefined;
 		if (data === null) return null;
 
 		const primitive = data instanceof String ? data.valueOf() : data;
 
 		// It might be a boolean.
-		if (primitive === 'true') return true;
-		if (primitive === 'false') return false;
-		if (primitive === 'null') return null;
-		if (primitive === 'undefined') return undefined;
-		if (primitive === 'NaN') return NaN;
-		if (primitive === 'Infinity') return Infinity;
+		if (primitive === "true") return true;
+		if (primitive === "false") return false;
+		if (primitive === "null") return null;
+		if (primitive === "undefined") return undefined;
+		if (primitive === "NaN") return NaN;
+		if (primitive === "Infinity") return Infinity;
 
 		if (Marshaller.SYMBOL_REGEX.test(primitive)) {
 			return this.marshalStringToSymbol(primitive);
@@ -1090,9 +1093,9 @@ export class Marshaller implements IMarshaller {
 	 * @param {Newable<U>|U} to
 	 * @returns {{}|null}
 	 */
-	private marshalTo<T, U> (data: T, to: Newable<U> | U): {} | null {
+	private marshalTo<T, U> (data: T, to: Newable<U>|U): {}|null {
 		if (typeof to === null) return this.marshalToNull(data);
-		if (typeof to === 'symbol' || to === Symbol) return this.marshalToSymbol(data);
+		if (typeof to === "symbol" || to === Symbol) return this.marshalToSymbol(data);
 		if (this.typeDetector.isString(to) || to === String) return this.marshalToString(data);
 		if (to instanceof Set || to === Set) return this.marshalToSet(data);
 		if (Array.isArray(to) || to === Array) return this.marshalToArray(data);
@@ -1109,18 +1112,18 @@ export class Marshaller implements IMarshaller {
 	 * @returns {string}
 	 */
 	private quoteIfNecessary (content: string): string {
-		if (!(typeof content === 'string')) return content;
+		if (!(typeof content === "string")) return content;
 		const firstChar = content[0];
 		const lastChar = content[content.length - 1];
-		let str = '`';
-		const startsWithClashingQuote = firstChar === '`';
-		const endsWithClashingQuote = lastChar === '`';
+		let str = "`";
+		const startsWithClashingQuote = firstChar === "`";
+		const endsWithClashingQuote = lastChar === "`";
 		const startOffset = startsWithClashingQuote ? 1 : 0;
 		const endOffset = endsWithClashingQuote ? 1 : 0;
-		if (startsWithClashingQuote) str += '\`';
+		if (startsWithClashingQuote) str += "\`";
 		str += content.slice(startOffset, content.length - endOffset);
-		if (endsWithClashingQuote) str += '\`';
-		str += '`';
+		if (endsWithClashingQuote) str += "\`";
+		str += "`";
 		return str;
 	}
 
@@ -1129,7 +1132,7 @@ export class Marshaller implements IMarshaller {
 	 * @param {string} primitive
 	 * @returns {object|null}
 	 */
-	private attemptStringToObjectConversion (primitive: string): { [key: string]: string } | null {
+	private attemptStringToObjectConversion (primitive: string): { [key: string]: string }|null {
 		try {
 			return JSON.parse(primitive);
 		} catch (e) {
@@ -1165,6 +1168,26 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * Returns true if the given string starts with the "class" keyword.
+	 * @param {string} str
+	 * @returns {boolean}
+	 */
+	private isClass (str: string): boolean {
+		const trimmed = str.trim();
+		return trimmed.startsWith("class");
+	}
+
+	/**
+	 * Extracts the name of the class (if the string is a class declaration).
+	 * @param {string} str
+	 * @returns {string}
+	 */
+	private takeClassName (str: string): string|null {
+		const match = str.match(/class\s+([^\s\n\t\r{]*)[\s\n\t\r{]/);
+		return match == null ? null : match[1];
+	}
+
+	/**
 	 * Formats an object so it fits a reconstructed object literal from a string.
 	 * @param {string} str
 	 * @returns {string}
@@ -1172,6 +1195,10 @@ export class Marshaller implements IMarshaller {
 	private formatObjectLiteralFunction (str: string): string {
 		if (this.isArrowFunction(str)) return str;
 		if (this.functionHasFunctionKeyword(str)) return str;
+		if (this.isClass(str)) {
+			const className = this.takeClassName(str);
+			if (className != null) return className;
+		}
 		return `function ${str}`;
 	}
 
