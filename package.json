@@ -1,6 +1,6 @@
 {
   "name": "@wessberg/marshaller",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "description": "A class that maps between a variety of data types.",
   "main": "./dist/cjs/index.js",
   "module": "./dist/es2015/index.js",
