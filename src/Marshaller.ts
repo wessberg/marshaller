@@ -1613,6 +1613,15 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * Returns true if the given content is a quote.
+	 * @param {string} content
+	 * @returns {boolean}
+	 */
+	private isQuote (content: string): boolean {
+		return /["'`]/.test(content);
+	}
+
+	/**
 	 * Quotes the given string if needed. It will escape the string if it already starts and/or ends with a clashing quote.
 	 * @param {string} content
 	 * @returns {string}
@@ -1621,6 +1630,7 @@ export class Marshaller implements IMarshaller {
 		if (!(typeof content === "string")) return content;
 		const firstChar = content[0];
 		const lastChar = content[content.length - 1];
+		if (this.isQuote(firstChar) && this.isQuote(lastChar)) return content;
 		let str = "`";
 		const startsWithClashingQuote = firstChar === "`";
 		const endsWithClashingQuote = lastChar === "`";

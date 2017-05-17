@@ -56,6 +56,10 @@ The marshalled version of the input data.
 
 ## Changelog:
 
+**v1.0.21**:
+
+- Made sure that quoted strings will not be re-quoted. 
+
 **v1.0.20**:
 
 - Added marshalling to/from class instances and class constructors.

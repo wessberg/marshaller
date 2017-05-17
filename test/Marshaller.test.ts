@@ -273,7 +273,7 @@ test(`'marshal()' string -> object. #1`, t => {
 
 	const input = "{\"foo\": false, \"type\": {\"expression\": `hello`}}";
 
-	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, expected), expected);
+	t.deepEqual(marshaller.marshal(input, expected), expected);
 });
 
 test(`'marshal()' class -> string. #1`, t => {
