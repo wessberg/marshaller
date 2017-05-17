@@ -25,10 +25,10 @@
   "license": "MIT",
   "devDependencies": {
     "ava": "^0.19.1",
-    "typescript": "2.3.0"
+    "typescript": "2.3.2"
   },
   "dependencies": {
     "@wessberg/globalobject": "^1.0.2",
-    "@wessberg/typedetector": "^1.0.4"
+    "@wessberg/typedetector": "^1.0.5"
   }
 }

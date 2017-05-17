@@ -8,6 +8,7 @@ import {GlobalObject, GlobalObjectIdentifier} from "@wessberg/globalobject";
  */
 export class Marshaller implements IMarshaller {
 	private static readonly SYMBOL_REGEX: RegExp = /Symbol\(([^)]*)\)/;
+	private static readonly CLASS_INSTANCE_REGEX: RegExp = /\w+\s*{}/;
 	private static readonly FUNCTION_REGEX_1: RegExp = /^\(*function\s*\w*\s*\([^)]*\)\s*{/;
 	private static readonly FUNCTION_REGEX_2: RegExp = /^\(+[^)]*\)\s*=>/;
 	private static readonly FUNCTION_REGEX_3: RegExp = /^\w+\s*=>/;
@@ -43,6 +44,24 @@ export class Marshaller implements IMarshaller {
 	 * @returns {null}
 	 */
 	private marshalStringToNull (_: string|String): null {
+		return null;
+	}
+
+	/**
+	 * Marshals a class into null.
+	 * @param {{}} _
+	 * @returns {null}
+	 */
+	private marshalClassToNull (_: {}): null {
+		return null;
+	}
+
+	/**
+	 * Marshals a constructor into null.
+	 * @param {Function} _
+	 * @returns {null}
+	 */
+	private marshalConstructorToNull (_: {}): null {
 		return null;
 	}
 
@@ -116,6 +135,24 @@ export class Marshaller implements IMarshaller {
 	 */
 	private marshalFunctionToNull (_: Function): null {
 		return null;
+	}
+
+	/**
+	 * Marshals a class into a string.
+	 * @param {{}} data
+	 * @returns {string}
+	 */
+	private marshalClassToString (data: {}): string {
+		return `new (${this.marshalToString(this.marshalClassToConstructor(data))})()`;
+	}
+
+	/**
+	 * Marshals a constructor into a string.
+	 * @param {{}} data
+	 * @returns {string}
+	 */
+	private marshalConstructorToString (data: {}): string {
+		return data.toString();
 	}
 
 	/**
@@ -220,6 +257,261 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * Marshals a constructor into a class instance.
+	 * @param {(args?: ?[]) => T} data
+	 * @returns {T}
+	 */
+	private marshalConstructorToClass<T> (data: new (args?: any[]) => T): T {
+		return new data();
+	}
+
+	/**
+	 * Marshals a symbol into a class.
+	 * @param {symbol} data
+	 * @returns {{}}
+	 */
+	private marshalSymbolToClass (data: symbol): {} {
+		const ctor = <new ()=> {}>this.marshalSymbolToConstructor(data);
+		return new ctor();
+	}
+
+	/**
+	 * Marshals a set into a class instance.
+	 * @param {Set<T>} data
+	 * @returns {{}}
+	 */
+	private marshalSetToClass<T> (data: Set<T>): {} {
+		const ctor = <new ()=> {}>this.marshalSetToConstructor(data);
+		return new ctor();
+	}
+
+	/**
+	 * Marshals undefined into a class.
+	 * @param {?} _
+	 * @returns {{}}
+	 */
+	private marshalUndefinedToClass (_: undefined): {} {
+		const ctor = <new ()=> {}>this.marshalUndefinedToConstructor(_);
+		return new ctor();
+	}
+
+	/**
+	 * Marshals null into a class.
+	 * @param {null} _
+	 * @returns {{}}
+	 */
+	private marshalNullToClass (_: null): {} {
+		const ctor = <new ()=> {}>this.marshalNullToConstructor(_);
+		return new ctor();
+	}
+
+	/**
+	 * Marshals an object into a class.
+	 * @param {object} data
+	 * @returns {{}}
+	 */
+	private marshalObjectToClass<T> (data: { [key: string]: T }): {} {
+		const ctor = <new ()=> {}>this.marshalObjectToConstructor(data);
+		return new ctor();
+	}
+
+	/**
+	 * Marshals a boolean into a class.
+	 * @param {boolean} data
+	 * @returns {{}}
+	 */
+	private marshalBooleanToClass (data: boolean|Boolean): {} {
+		const ctor = <new ()=> {}>this.marshalBooleanToConstructor(data);
+		return new ctor();
+	}
+
+	/**
+	 * Marshals a number into a class.
+	 * @param {number} data
+	 * @returns {{}}
+	 */
+	private marshalNumberToClass (data: number|Number): {} {
+		const ctor = <new ()=> {}>this.marshalNumberToConstructor(data);
+		return new ctor();
+	}
+
+	/**
+	 * Marshals an array into a class.
+	 * @param {T[]} data
+	 * @returns {{}}
+	 */
+	private marshalArrayToClass<T> (data: T[]): {} {
+		const ctor = <new ()=> {}>this.marshalArrayToConstructor(data);
+		return new ctor();
+	}
+
+	/**
+	 * Marshals a function into a class.
+	 * @param {Function} data
+	 * @returns {{}}
+	 */
+	private marshalFunctionToClass (data: Function): {} {
+		const ctor = <new ()=> {}>this.marshalFunctionToConstructor(data);
+		return new ctor();
+	}
+
+	/**
+	 * Marshals a string into a class instance.
+	 * @param {string} data
+	 * @returns {{}}
+	 */
+	private marshalStringToClass (data: string): {} {
+		const ctor = <new ()=> {}>this.marshalStringToConstructor(data);
+		return new ctor();
+	}
+
+	/**
+	 * Marshals a string into a constructor.
+	 * @param {string|String} data
+	 * @returns {Function}
+	 */
+	private marshalStringToConstructor (data: string|String): Function {
+		const primitive = data instanceof String ? data.valueOf() : data;
+		if (!primitive.trim().startsWith("class")) {
+			class Class {
+				payload = primitive
+			}
+			return Class;
+		}
+		return new Function(`return (${data})`)();
+	}
+
+
+
+	/**
+	 * Marshals a class into a constructor.
+	 * @param {T} data
+	 * @returns {Function}
+	 */
+	private marshalClassToConstructor<T> (data: T): Function {
+		return data.constructor;
+	}
+
+	/**
+	 * Marshals a symbol into a constructor.
+	 * @param {symbol} data
+	 * @returns {Function}
+	 */
+	private marshalSymbolToConstructor (data: symbol): Function {
+		class Class {
+			payload = data;
+		}
+
+		return Class;
+	}
+
+	/**
+	 * Marshals a set into a constructor.
+	 * @param {Set<T>} data
+	 * @returns {Function}
+	 */
+	private marshalSetToConstructor<T> (data: Set<T>): Function {
+		class Class {
+			payload = data;
+		}
+		return Class;
+	}
+
+	/**
+	 * Marshals undefined into a constructor.
+	 * @param {?} _
+	 * @returns {Function}
+	 */
+	private marshalUndefinedToConstructor (_: undefined): Function {
+		class Class {
+			payload = undefined;
+		}
+
+		return Class;
+	}
+
+	/**
+	 * Marshals null into a constructor.
+	 * @param {null} _
+	 * @returns {Function}
+	 */
+	private marshalNullToConstructor (_: null): Function {
+		class Class {
+			payload = null;
+		}
+
+		return Class;
+	}
+
+	/**
+	 * Marshals an object into a class.
+	 * @param {object} data
+	 * @returns {Function}
+	 */
+	private marshalObjectToConstructor<T> (data: { [key: string]: T }): Function {
+		class Class {}
+
+		Object.keys(data).forEach(key => {
+			(<any>Class)[key] = data[key];
+		});
+		return Class;
+	}
+
+	/**
+	 * Marshals a boolean into a constructor.
+	 * @param {boolean} data
+	 * @returns {Function}
+	 */
+	private marshalBooleanToConstructor (data: boolean|Boolean): Function {
+		class Class {
+			payload = data;
+		}
+
+		return Class;
+	}
+
+	/**
+	 * Marshals a number into a class.
+	 * @param {number} data
+	 * @returns {Function}
+	 */
+	private marshalNumberToConstructor (data: number|Number): Function {
+		class Class {
+			payload = data;
+		}
+
+		return Class;
+	}
+
+	/**
+	 * Marshals an array into a constructor.
+	 * @param {T[]} data
+	 * @returns {Function}
+	 */
+	private marshalArrayToConstructor<T> (data: T[]): Function {
+		class Class {}
+
+		data.forEach((item, index) => {
+			(<any>Class)[index] = item;
+		});
+
+		return Class;
+	}
+
+	/**
+	 * Marshals a function into a constructor.
+	 * @param {Function} data
+	 * @returns {Function}
+	 */
+	private marshalFunctionToConstructor (data: Function): Function {
+		class Class {
+			payload = data;
+		}
+
+		return Class;
+	}
+
+	/**
 	 * Marshals null into a function.
 	 * @param {null} _
 	 * @returns {Function}
@@ -252,6 +544,24 @@ export class Marshaller implements IMarshaller {
 	 * @returns {Function}
 	 */
 	private marshalSymbolToFunction (data: symbol): Function {
+		return () => data;
+	}
+
+	/**
+	 * Marshals a class into a function.
+	 * @param {symbol} data
+	 * @returns {Function}
+	 */
+	private marshalClassToFunction (data: {}): Function {
+		return () => data;
+	}
+
+	/**
+	 * Marshals a constructor into a function.
+	 * @param {Function} data
+	 * @returns {Function}
+	 */
+	private marshalConstructorToFunction (data: Function): Function {
 		return () => data;
 	}
 
@@ -311,6 +621,24 @@ export class Marshaller implements IMarshaller {
 	private marshalStringToBoolean (data: string|String): boolean {
 		const primitive = data instanceof String ? data.valueOf() : data;
 		return primitive === "true" || primitive === "1" || primitive === "";
+	}
+
+	/**
+	 * Marshals a class into a boolean.
+	 * @param {{}} _
+	 * @returns {boolean}
+	 */
+	private marshalClassToBoolean (_: {}): boolean {
+		return true;
+	}
+
+	/**
+	 * Marshals a constructor into a boolean.
+	 * @param {Function} _
+	 * @returns {boolean}
+	 */
+	private marshalConstructorToBoolean (_: Function): boolean {
+		return true;
 	}
 
 	/**
@@ -413,6 +741,24 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * Marshals a class into a symbol.
+	 * @param {{}} data
+	 * @returns {symbol}
+	 */
+	private marshalClassToSymbol (data: {}): symbol {
+		return Symbol(this.marshalClassToString(data));
+	}
+
+	/**
+	 * Marshals a class into a symbol.
+	 * @param {Function} data
+	 * @returns {symbol}
+	 */
+	private marshalConstructorToSymbol (data: Function): symbol {
+		return Symbol(this.marshalConstructorToString(data));
+	}
+
+	/**
 	 * Marshals a string into a symbol.
 	 * @param {null} _
 	 * @returns {symbol}
@@ -497,6 +843,24 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * Marshals a class into a number.
+	 * @param {{}} _
+	 * @returns {number}
+	 */
+	private marshalClassToNumber (_: {}): number {
+		return 0;
+	}
+
+	/**
+	 * Marshals a constructor into a number.
+	 * @param {Function} _
+	 * @returns {number}
+	 */
+	private marshalConstructorToNumber (_: Function): number {
+		return 0;
+	}
+
+	/**
 	 * Marshals null into a number.
 	 * @param {null} _
 	 * @returns {number}
@@ -570,6 +934,26 @@ export class Marshaller implements IMarshaller {
 	private marshalStringToSet (data: string|String): Set<string> {
 		const primitive = data instanceof String ? data.valueOf() : data;
 		return new Set([primitive]);
+	}
+
+	/**
+	 * Marshals a class into a Set.
+	 * @param {{}} data
+	 * @returns {Set<string>}
+	 */
+	private marshalClassToSet (data: {}): Set<string> {
+		const instanceKeys = Object.getOwnPropertyNames(data.constructor.prototype);
+		const staticKeys = Object.getOwnPropertyNames(data.constructor);
+		return new Set([...instanceKeys, ...staticKeys]);
+	}
+
+	/**
+	 * Marshals a constructor into a Set.
+	 * @param {Function} data
+	 * @returns {Set<string>}
+	 */
+	private marshalConstructorToSet (data: Function): Set<string> {
+		return new Set(Object.getOwnPropertyNames(data));
 	}
 
 	/**
@@ -663,6 +1047,24 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * Marshals a class into an Array.
+	 * @param {{}} data
+	 * @returns {{}[]}
+	 */
+	private marshalClassToArray (data: {}): {}[] {
+		return [data];
+	}
+
+	/**
+	 * Marshals a constructor into an Array.
+	 * @param {Function} data
+	 * @returns {Function[]}
+	 */
+	private marshalConstructorToArray (data: Function): Function[] {
+		return [data];
+	}
+
+	/**
 	 * Marshals undefined into an Array.
 	 * @param {?} _
 	 * @returns {?[]}
@@ -746,6 +1148,42 @@ export class Marshaller implements IMarshaller {
 	private marshalArrayToObject<T> (data: T[]): { [key: number]: T } {
 		const obj: { [key: string]: T } = {};
 		for (let i = 0; i < data.length; i++) obj[i] = data[i];
+		return obj;
+	}
+
+	/**
+	 * Marshals a class into an Object.
+	 * @param {{}} data
+	 * @returns {object}
+	 */
+	private marshalClassToObject (data: {}): { [key: string]: {} } {
+		const obj: { [key: string]: {} } = {};
+		const instanceKeys = Object.getOwnPropertyNames(data.constructor.prototype);
+		const staticKeys = Object.getOwnPropertyNames(data.constructor);
+		instanceKeys.forEach(key => {
+			const prop = (<{ [key: string]: {} }>data)[key];
+			obj[key] = prop;
+		});
+
+		staticKeys.forEach(key => {
+			obj[key] = (<any>data)["constructor"][key];
+		});
+
+		return obj;
+	}
+
+	/**
+	 * Marshals a constructor into an Object.
+	 * @param {Function} data
+	 * @returns {object}
+	 */
+	private marshalConstructorToObject (data: Function): { [key: string]: {} } {
+		const obj: { [key: string]: {} } = {};
+		const staticKeys = Object.getOwnPropertyNames(data);
+		staticKeys.forEach(key => {
+			obj[key] = (<any>data)[key];
+		});
+
 		return obj;
 	}
 
@@ -835,6 +1273,48 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * Marshals the given data, whatever the type, into a constructor.
+	 * @param {T} data
+	 * @returns {Function|null}
+	 */
+	private marshalToConstructor<T> (data: T): Function|null {
+		if (data === undefined) return this.marshalUndefinedToConstructor(data);
+		if (data === null) return this.marshalNullToConstructor(data);
+		if (this.typeDetector.isBoolean(data)) return this.marshalBooleanToConstructor(data);
+		if (this.typeDetector.isClassConstructor(data)) return data;
+		if (this.typeDetector.isClassInstance(data)) return this.marshalClassToConstructor(data);
+		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToConstructor(data);
+		if (this.typeDetector.isString(data))  return this.marshalStringToConstructor(data);
+		if (typeof data === "symbol") return this.marshalSymbolToConstructor(data);
+		if (data instanceof Set)     return this.marshalSetToConstructor(data);
+		if (Array.isArray(data))   return this.marshalArrayToConstructor(data);
+		if (this.typeDetector.isObject(data))  return this.marshalObjectToConstructor(data);
+		if (this.typeDetector.isNumber(data))  return this.marshalNumberToConstructor(data);
+		return data == null ? null : data;
+	}
+
+	/**
+	 * Marshals the given data, whatever the type, into a class instance.
+	 * @param {T} data
+	 * @returns {{}|null}
+	 */
+	private marshalToClass<T> (data: T): {}|null {
+		if (data === undefined) return this.marshalUndefinedToClass(data);
+		if (data === null) return this.marshalNullToClass(data);
+		if (this.typeDetector.isBoolean(data)) return this.marshalBooleanToClass(data);
+		if (this.typeDetector.isClassConstructor(data)) return this.marshalConstructorToClass(<any>data);
+		if (this.typeDetector.isClassInstance(data)) return data;
+		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToClass(data);
+		if (this.typeDetector.isString(data))  return this.marshalStringToClass(data);
+		if (typeof data === "symbol") return this.marshalSymbolToClass(data);
+		if (data instanceof Set)     return this.marshalSetToClass(data);
+		if (Array.isArray(data))   return this.marshalArrayToClass(data);
+		if (this.typeDetector.isObject(data))  return this.marshalObjectToClass(data);
+		if (this.typeDetector.isNumber(data))  return this.marshalNumberToClass(data);
+		return data == null ? null : data;
+	}
+
+	/**
 	 * Marshals the given data, whatever the type, into a boolean.
 	 * @param {T} data
 	 * @returns {boolean|null}
@@ -843,6 +1323,8 @@ export class Marshaller implements IMarshaller {
 		if (data === undefined) return this.marshalUndefinedToBoolean(data);
 		if (data === null) return this.marshalNullToBoolean(data);
 		if (this.typeDetector.isBoolean(data)) return data;
+		if (this.typeDetector.isClassConstructor(data)) return this.marshalConstructorToBoolean(<Function>data);
+		if (this.typeDetector.isClassInstance(data)) return this.marshalClassToBoolean(data);
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToBoolean(data);
 		if (this.typeDetector.isString(data))  return this.marshalStringToBoolean(data);
 		if (typeof data === "symbol") return this.marshalSymbolToBoolean(data);
@@ -862,6 +1344,8 @@ export class Marshaller implements IMarshaller {
 		if (data === undefined) return this.marshalUndefinedToNumber(data);
 		if (data === null) return this.marshalNullToNumber(data);
 		if (this.typeDetector.isNumber(data))   return data;
+		if (this.typeDetector.isClassConstructor(data)) return this.marshalConstructorToNumber(<Function>data);
+		if (this.typeDetector.isClassInstance(data)) return this.marshalClassToNumber(data);
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToNumber(data);
 		if (this.typeDetector.isString(data))  return this.marshalStringToNumber(data);
 		if (typeof data === "symbol") return this.marshalSymbolToNumber(data);
@@ -881,6 +1365,8 @@ export class Marshaller implements IMarshaller {
 		if (data === undefined) return this.marshalUndefinedToSymbol(data);
 		if (data === null) return this.marshalNullToSymbol(data);
 		if (typeof data === "symbol") return data;
+		if (this.typeDetector.isClassConstructor(data)) return this.marshalConstructorToSymbol(<Function>data);
+		if (this.typeDetector.isClassInstance(data)) return this.marshalClassToSymbol(data);
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToSymbol(data);
 		if (this.typeDetector.isString(data)) return this.marshalStringToSymbol(data);
 		if (data instanceof Set)      return this.marshalSetToSymbol(data);
@@ -889,7 +1375,7 @@ export class Marshaller implements IMarshaller {
 		if (this.typeDetector.isBoolean(data))  return this.marshalBooleanToSymbol(data);
 		if (this.typeDetector.isNumber(data))    return this.marshalNumberToSymbol(data);
 		if (data == null) return null;
-		return Symbol(data.toString());
+		return Symbol(data);
 	}
 
 	/**
@@ -902,6 +1388,8 @@ export class Marshaller implements IMarshaller {
 		if (data === undefined) return this.marshalUndefinedToString(data);
 		if (data === null) return this.marshalNullToString(data);
 		if (this.typeDetector.isString(data)) return (<String>data instanceof String ? <string>data.valueOf() : data);
+		if (this.typeDetector.isClassConstructor(data)) return this.marshalConstructorToString(<Function>data);
+		if (this.typeDetector.isClassInstance(data)) return this.marshalClassToString(data);
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToString(data);
 		if (typeof data === "symbol") return this.marshalSymbolToString(data);
 		if (data instanceof Set)      return this.marshalSetToString(data);
@@ -910,7 +1398,7 @@ export class Marshaller implements IMarshaller {
 		if (this.typeDetector.isBoolean(data))  return this.marshalBooleanToString(data);
 		if (this.typeDetector.isNumber(data))    return this.marshalNumberToString(data);
 		if (data == null) return null;
-		return data.toString();
+		return data;
 	}
 
 	/**
@@ -921,6 +1409,8 @@ export class Marshaller implements IMarshaller {
 	private marshalToFunction<T> (data: T): Function|null {
 		if (data === undefined) return this.marshalUndefinedToFunction(data);
 		if (data === null) return this.marshalNullToFunction(data);
+		if (this.typeDetector.isClassConstructor(data)) return this.marshalConstructorToFunction(<Function>data);
+		if (this.typeDetector.isClassInstance(data)) return this.marshalClassToFunction(data);
 		if (this.typeDetector.isFunction(data)) return data;
 		if (this.typeDetector.isString(data)) return this.marshalStringToFunction(data);
 		if (typeof data === "symbol") return this.marshalSymbolToFunction(data);
@@ -943,6 +1433,8 @@ export class Marshaller implements IMarshaller {
 		if (data === null) return this.marshalNullToSet(data);
 		if (data instanceof Set)      return data;
 		if (this.typeDetector.isString(data))   return this.marshalStringToSet(data);
+		if (this.typeDetector.isClassConstructor(data)) return this.marshalConstructorToSet(<Function>data);
+		if (this.typeDetector.isClassInstance(data)) return this.marshalClassToSet(data);
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToSet(data);
 		if (typeof data === "symbol") return this.marshalSymbolToSet(data);
 		if (Array.isArray(data))    return this.marshalArrayToSet(data);
@@ -962,6 +1454,8 @@ export class Marshaller implements IMarshaller {
 		if (data === null) return this.marshalNullToArray(data);
 		if (Array.isArray(data))    return data;
 		if (this.typeDetector.isString(data))   return this.marshalStringToArray(data);
+		if (this.typeDetector.isClassConstructor(data)) return this.marshalConstructorToArray(<Function>data);
+		if (this.typeDetector.isClassInstance(data)) return this.marshalClassToArray(data);
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToArray(data);
 		if (typeof data === "symbol") return this.marshalSymbolToArray(data);
 		if (data instanceof Set)      return this.marshalSetToArray(data);
@@ -980,6 +1474,8 @@ export class Marshaller implements IMarshaller {
 		if (data === undefined) return this.marshalUndefinedToObject(data);
 		if (data === null) return this.marshalNullToObject(data);
 		if (this.typeDetector.isObject(data))    return data;
+		if (this.typeDetector.isClassConstructor(data)) return this.marshalConstructorToObject(<Function>data);
+		if (this.typeDetector.isClassInstance(data)) return this.marshalClassToObject(data);
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToObject(data);
 		if (Array.isArray(data))    return this.marshalArrayToObject(data);
 		if (typeof data === "symbol") return this.marshalSymbolToObject(data);
@@ -999,6 +1495,8 @@ export class Marshaller implements IMarshaller {
 		if (data === undefined) return this.marshalUndefinedToNull(data);
 		if (data == null) return null;
 		if (this.typeDetector.isObject(data))    return this.marshalObjectToNull(data);
+		if (this.typeDetector.isClassConstructor(data)) return this.marshalConstructorToNull(<Function>data);
+		if (this.typeDetector.isClassInstance(data)) return this.marshalClassToNull(data);
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToNull(data);
 		if (Array.isArray(data))    return this.marshalArrayToNull(data);
 		if (typeof data === "symbol") return this.marshalSymbolToNull(data);
@@ -1062,9 +1560,15 @@ export class Marshaller implements IMarshaller {
 		if (primitive === "NaN") return NaN;
 		if (primitive === "Infinity") return Infinity;
 
+		if (Marshaller.CLASS_INSTANCE_REGEX.test(primitive)) {
+			return this.marshalStringToClass(primitive);
+		}
+
 		if (Marshaller.SYMBOL_REGEX.test(primitive)) {
 			return this.marshalStringToSymbol(primitive);
 		}
+
+		if (primitive.trim().startsWith("class ")) return this.marshalStringToConstructor(data);
 
 		// It might be a number.
 		const toNum = Number.parseFloat(primitive);
@@ -1096,6 +1600,8 @@ export class Marshaller implements IMarshaller {
 	private marshalTo<T, U> (data: T, to: Newable<U>|U): {}|null {
 		if (typeof to === null) return this.marshalToNull(data);
 		if (typeof to === "symbol" || to === Symbol) return this.marshalToSymbol(data);
+		if (typeof to === <any>"constructor" || this.typeDetector.isClassConstructor(to)) return this.marshalToConstructor(data);
+		if (typeof to === <any>"class" || this.typeDetector.isClassInstance(to)) return this.marshalToClass(data);
 		if (this.typeDetector.isString(to) || to === String) return this.marshalToString(data);
 		if (to instanceof Set || to === Set) return this.marshalToSet(data);
 		if (Array.isArray(to) || to === Array) return this.marshalToArray(data);

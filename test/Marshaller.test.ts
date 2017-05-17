@@ -112,7 +112,8 @@ test(`'marshal()' string -> number. #3`, t => {
 });
 
 test(`'marshal()' string -> function. #1`, t => {
-	const expected = function () {};
+	const expected = function () {
+	};
 	const input = `function () {}`;
 
 	const marshalled = marshaller.marshal(input, expected);
@@ -134,7 +135,8 @@ test(`'marshal()' string -> best guess. #2`, t => {
 
 test(`'marshal()' string -> best guess. #3`, t => {
 	const input = `() => {}`;
-	const expected = () => {};
+	const expected = () => {
+	};
 
 	const marshalled = marshaller.marshal(input);
 	if (marshalled == null) t.fail();
@@ -143,7 +145,8 @@ test(`'marshal()' string -> best guess. #3`, t => {
 
 test(`'marshal()' string -> best guess. #4`, t => {
 	const input = `function () {}`;
-	const expected = function () {};
+	const expected = function () {
+	};
 
 	const marshalled = marshaller.marshal(input);
 	if (marshalled == null) t.fail();
@@ -183,7 +186,7 @@ test(`'marshal()' string -> best guess. #8`, t => {
 });
 
 test(`'marshal()' object -> string. #1`, t => {
-	const expected = '{"a": 2}';
+	const expected = "{\"a\": 2}";
 	const input = {
 		a: 2
 	};
@@ -192,17 +195,18 @@ test(`'marshal()' object -> string. #1`, t => {
 });
 
 test(`'marshal()' object -> string. #2`, t => {
-	const expected = '{"a": 2, "b": () => {}}';
+	const expected = "{\"a\": 2, \"b\": () => {}}";
 	const input = {
 		a: 2,
-		b: () => {}
+		b: () => {
+		}
 	};
 
 	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, expected), expected);
 });
 
 test(`'marshal()' object -> string. #3`, t => {
-	const expected = '{"c": {"d": `hello sir!`}}';
+	const expected = "{\"c\": {\"d\": `hello sir!`}}";
 	const input = {
 		c: {
 			d: "hello sir!"
@@ -213,7 +217,7 @@ test(`'marshal()' object -> string. #3`, t => {
 });
 
 test(`'marshal()' object -> string. #4`, t => {
-	const expected = '{"foo": false, "type": {"expression": `hello`}}';
+	const expected = "{\"foo\": false, \"type\": {\"expression\": `hello`}}";
 	const foo = false;
 	const exp = "hello";
 	const input = {
@@ -227,7 +231,7 @@ test(`'marshal()' object -> string. #4`, t => {
 });
 
 test(`'marshal()' object -> string. #5`, t => {
-	const expected = '{"foo": false}';
+	const expected = "{\"foo\": false}";
 	const input = {
 		"foo": false
 	};
@@ -236,8 +240,11 @@ test(`'marshal()' object -> string. #5`, t => {
 });
 
 test(`'marshal()' object -> string. #6`, t => {
-	const expected = '{"foo": Foo}';
-	class Foo {}
+	const expected = "{\"foo\": class Foo {}}";
+
+	class Foo {
+	}
+
 	const input = {
 		"foo": Foo
 	};
@@ -264,7 +271,53 @@ test(`'marshal()' string -> object. #1`, t => {
 		}
 	};
 
-	const input = '{"foo": false, "type": {"expression": `hello`}}';
+	const input = "{\"foo\": false, \"type\": {\"expression\": `hello`}}";
 
 	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, expected), expected);
+});
+
+test(`'marshal()' class -> string. #1`, t => {
+	class A {
+		get foo () {
+			return true;
+		}
+	}
+
+	const expected = `new (class A {
+        get foo() {
+            return true;
+        }
+    })()`;
+	const input = new A();
+
+	const result = <string>marshaller.marshal(input, expected);
+	t.deepEqual(result, expected);
+});
+
+test(`'marshal()' class -> string. #2`, t => {
+	class A {
+		constructor (_1: any, _2: any) {
+		}
+
+		static get foo () {
+			return true;
+		}
+
+		static bar () {
+			return false;
+		}
+	}
+
+	const expected = `new (class A {
+        constructor(_1, _2) {}
+        static get foo() {
+            return true;
+        }
+        static bar() {
+            return false;
+        }
+    })()`;
+	const input = new A(1, 2);
+	const result = <string>marshaller.marshal(input, expected);
+	t.deepEqual(result, expected);
 });

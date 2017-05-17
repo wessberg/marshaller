@@ -43,6 +43,8 @@ The marshalled version of the input data.
 * [X] Casting from/to `boolean`.
 * [X] Casting from/to `Array`.
 * [X] Casting from/to `symbol`.
+* [X] Casting from/to `class`.
+* [X] Casting from/to `constructor`.
 * [X] Casting from/to `null`.
 * [X] Casting from/to `undefined`.
 * [ ] Casting from/to `Date`.
@@ -53,6 +55,10 @@ The marshalled version of the input data.
 * [ ] Casting from/to `RegExp`
 
 ## Changelog:
+
+**v1.0.20**:
+
+- Added marshalling to/from class instances and class constructors.
 
 **v1.0.19**:
 
