@@ -48,6 +48,15 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * Marshals a map into null.
+	 * @param {Map<{}, {}>} _
+	 * @returns {null}
+	 */
+	private marshalMapToNull (_: Map<{}, {}>): null {
+		return null;
+	}
+
+	/**
 	 * Marshals a class into null.
 	 * @param {{}} _
 	 * @returns {null}
@@ -147,6 +156,15 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * Marshals a map into a string.
+	 * @param {Map<{}, {}>} map
+	 * @returns {string}
+	 */
+	private marshalMapToString (map: Map<{}, {}>): string {
+		return `new Map(${this.marshalArrayToString([...map.entries()])})`;
+	}
+
+	/**
 	 * Marshals a constructor into a string.
 	 * @param {{}} data
 	 * @returns {string}
@@ -161,9 +179,7 @@ export class Marshaller implements IMarshaller {
 	 * @returns {string}
 	 */
 	private marshalSetToString<T> (data: Set<T>): string {
-		let representation = "";
-		data.forEach(entry => representation += JSON.stringify(entry, null, "\t"));
-		return representation;
+		return `new Set(${this.marshalArrayToString([...data.keys()])})`;
 	}
 
 	/**
@@ -276,6 +292,16 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * Marshals a Map into a class instance.
+	 * @param {Map<{}, {}>} data
+	 * @returns {{}}
+	 */
+	private marshalMapToClass (data: Map<{}, {}>): {} {
+		const ctor = <new ()=> {}>this.marshalMapToConstructor(data);
+		return new ctor();
+	}
+
+	/**
 	 * Marshals a set into a class instance.
 	 * @param {Set<T>} data
 	 * @returns {{}}
@@ -373,9 +399,8 @@ export class Marshaller implements IMarshaller {
 	private marshalStringToConstructor (data: string|String): Function {
 		const primitive = data instanceof String ? data.valueOf() : data;
 		if (!primitive.trim().startsWith("class")) {
-			class Class {
-				payload = primitive
-			}
+			class Class {}
+			(<any>Class)[<any>data] = data;
 			return Class;
 		}
 		return new Function(`return (${data})`)();
@@ -398,8 +423,22 @@ export class Marshaller implements IMarshaller {
 	 * @returns {Function}
 	 */
 	private marshalSymbolToConstructor (data: symbol): Function {
-		class Class {
-			payload = data;
+		class Class {}
+		(<any>Class)[<any>data] = data;
+		return Class;
+	}
+
+	/**
+	 * Marshals an object into a class.
+	 * @param {object} data
+	 * @returns {Function}
+	 */
+	private marshalMapToConstructor (data: Map<{}, {}>): Function {
+		class Class {}
+
+		for (const entry of data.entries()) {
+			const [key, value] = entry;
+			(<any>Class)[<any>key] = value;
 		}
 
 		return Class;
@@ -411,9 +450,11 @@ export class Marshaller implements IMarshaller {
 	 * @returns {Function}
 	 */
 	private marshalSetToConstructor<T> (data: Set<T>): Function {
-		class Class {
-			payload = data;
+		class Class {}
+		for (const key of data.keys()) {
+			(<any>Class)[<any>key] = key;
 		}
+
 		return Class;
 	}
 
@@ -423,9 +464,7 @@ export class Marshaller implements IMarshaller {
 	 * @returns {Function}
 	 */
 	private marshalUndefinedToConstructor (_: undefined): Function {
-		class Class {
-			payload = undefined;
-		}
+		class Class {}
 
 		return Class;
 	}
@@ -436,10 +475,7 @@ export class Marshaller implements IMarshaller {
 	 * @returns {Function}
 	 */
 	private marshalNullToConstructor (_: null): Function {
-		class Class {
-			payload = null;
-		}
-
+		class Class {}
 		return Class;
 	}
 
@@ -462,11 +498,8 @@ export class Marshaller implements IMarshaller {
 	 * @param {boolean} data
 	 * @returns {Function}
 	 */
-	private marshalBooleanToConstructor (data: boolean|Boolean): Function {
-		class Class {
-			payload = data;
-		}
-
+	private marshalBooleanToConstructor (_: boolean|Boolean): Function {
+		class Class {}
 		return Class;
 	}
 
@@ -476,10 +509,8 @@ export class Marshaller implements IMarshaller {
 	 * @returns {Function}
 	 */
 	private marshalNumberToConstructor (data: number|Number): Function {
-		class Class {
-			payload = data;
-		}
-
+		class Class {}
+		(<any>Class)[<any>data] = data;
 		return Class;
 	}
 
@@ -504,10 +535,8 @@ export class Marshaller implements IMarshaller {
 	 * @returns {Function}
 	 */
 	private marshalFunctionToConstructor (data: Function): Function {
-		class Class {
-			payload = data;
-		}
-
+		class Class {}
+		(<any>Class)[data.name] = data;
 		return Class;
 	}
 
@@ -527,6 +556,15 @@ export class Marshaller implements IMarshaller {
 	 */
 	private marshalUndefinedToFunction (_: null): Function {
 		return () => undefined;
+	}
+
+	/**
+	 * Marshals a set into a function.
+	 * @param {Map<{}, {}>} data
+	 * @returns {Function}
+	 */
+	private marshalMapToFunction (data: Map<{}, {}>): Function {
+		return () => data;
 	}
 
 	/**
@@ -680,6 +718,15 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * Marshals a Map into a boolean.
+	 * @param {Map<{}, {}>} _
+	 * @returns {boolean}
+	 */
+	private marshalMapToBoolean (_: Map<{}, {}>): boolean {
+		return true;
+	}
+
+	/**
 	 * Marshals a Set into a boolean.
 	 * @param {Set<T>} _
 	 * @returns {boolean}
@@ -787,6 +834,15 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * Marshals a Map into a symbol.
+	 * @param {Map<string, string>} data
+	 * @returns {symbol}
+	 */
+	private marshalMapToSymbol (data: Map<{}, {}>): symbol {
+		return Symbol(this.marshalMapToString(data));
+	}
+
+	/**
 	 * Marshals a set into a symbol.
 	 * @param {Set<T>} data
 	 * @returns {symbol}
@@ -887,6 +943,15 @@ export class Marshaller implements IMarshaller {
 		const match = data.toString().match(Marshaller.SYMBOL_REGEX);
 		if (match == null) throw new ReferenceError(`${this.marshalSymbolToNumber.name} was given an invalid symbol to marshal!`);
 		return this.marshalStringToNumber(match[1]);
+	}
+
+	/**
+	 * Marshals a Map into a number.
+	 * @param {Map<{}, {}>} data
+	 * @returns {number}
+	 */
+	private marshalMapToNumber (data: Map<{}, {}>): number {
+		return data.size;
 	}
 
 	/**
@@ -1031,6 +1096,141 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * Marshals a string into a Map.
+	 * @param {string} data
+	 * @returns {Map<string, string>}
+	 */
+	private marshalStringToMap (data: string|String): Map<string, string> {
+		const primitive = data instanceof String ? data.valueOf() : data;
+		return new Map([[primitive, primitive]]);
+	}
+
+	/**
+	 * Marshals a class into a Map.
+	 * @param {{}} data
+	 * @returns {Map<string, {}>}
+	 */
+	private marshalClassToMap (data: {}): Map<string, {}> {
+		const map: Map<string, {}> = new Map();
+		const instanceKeys = Object.getOwnPropertyNames(data.constructor.prototype);
+		const staticKeys = Object.getOwnPropertyNames(data.constructor);
+		instanceKeys.forEach(key => {
+			map.set(key, (<{ [key: string]: {} }>data)[key]);
+		});
+
+		staticKeys.forEach(key => {
+			map.set(key, (<any>data)["constructor"][key]);
+		});
+
+		return map;
+	}
+
+	/**
+	 * Marshals a constructor into a Map.
+	 * @param {Function} data
+	 * @returns {Map<string, {}>}
+	 */
+	private marshalConstructorToMap (data: Function): Map<string, {}> {
+		const map: Map<string, {}> = new Map();
+		const staticKeys = Object.getOwnPropertyNames(data);
+		staticKeys.forEach(key => {
+			map.set(key, (<any>data)[key]);
+		});
+
+		return map;
+	}
+
+	/**
+	 * Marshals undefined into a Map.
+	 * @param {?} _
+	 * @returns {Map<?, ?>}
+	 */
+	private marshalUndefinedToMap (_: null): Map<undefined, undefined> {
+		return new Map([[undefined, undefined]]);
+	}
+
+	/**
+	 * Marshals null into a Map.
+	 * @param {null} _
+	 * @returns {Map<null, null>}
+	 */
+	private marshalNullToMap (_: null): Map<null, null> {
+		return new Map([[null, null]]);
+	}
+
+	/**
+	 * Marshals a symbol into a Map.
+	 * @param {symbol} data
+	 * @returns {Map<symbol, symbol>}
+	 */
+	private marshalSymbolToMap (data: symbol): Map<Symbol, Symbol> {
+		return new Map([[data, data]]);
+	}
+
+	/**
+	 * Marshals a Function into a Map.
+	 * @param {Function} data
+	 * @returns {Map<Function, Function>}
+	 */
+	private marshalFunctionToMap (data: Function): Map<Function, Function> {
+		return new Map([[data, data]]);
+	}
+
+	/**
+	 * Marshals a Set into a Map.
+	 * @param {Set<T>} data
+	 * @returns {Map<{}, {}>}
+	 */
+	private marshalSetToMap<T> (data: Set<T>): Map<{}, {}> {
+
+		try {
+			return new Map(<any>data);
+		} catch (ex) {
+			return new Map(data.entries());
+		}
+	}
+
+	/**
+	 * Marshals an array into a Map.
+	 * @param {T[]} data
+	 * @returns {Map<number, T>}
+	 */
+	private marshalArrayToMap<T> (data: T[]): Map<number, T> {
+		const map: Map<number, T> = new Map();
+		data.forEach((key, index) => map.set(index, key));
+		return map;
+	}
+
+	/**
+	 * Marshals an object into a Map.
+	 * @param {object} data
+	 * @returns {Map<string, T>}
+	 */
+	private marshalObjectToMap<T> (data: { [key: string]: T }): Map<string, T> {
+		return new Map(Object.entries(data));
+	}
+
+	/**
+	 * Marshals a boolean into a Set.
+	 * @param {boolean} data
+	 * @returns {Map<boolean, boolean>}
+	 */
+	private marshalBooleanToMap (data: boolean|Boolean): Map<boolean, boolean> {
+		const primitive = data instanceof Boolean ? data.valueOf() : data;
+		return new Map([[primitive, primitive]]);
+	}
+
+	/**
+	 * Marshals a number into a Map.
+	 * @param {number} data
+	 * @returns {Map<number, number>}
+	 */
+	private marshalNumberToMap (data: number|Number): Map<number, number> {
+		const primitive = data instanceof Number ? data.valueOf() : data;
+		return new Map([[primitive, primitive]]);
+	}
+
+	/**
 	 * Marshals a string into an Array.
 	 * @param {string} data
 	 * @returns {string[]}
@@ -1100,6 +1300,24 @@ export class Marshaller implements IMarshaller {
 	 */
 	private marshalFunctionToArray (data: Function): Function[] {
 		return [data];
+	}
+
+	/**
+	 * Marshals a Map into a Set.
+	 * @param {Map<{}, {}>} data
+	 * @returns {Set<[{}, {}]>}
+	 */
+	private marshalMapToSet (data: Map<{}, {}>): Set<[{}, {}]> {
+		return new Set(data);
+	}
+
+	/**
+	 * Marshals a Map into an Array.
+	 * @param {Map<{}, {}>} data
+	 * @returns {[{}, {}][]}
+	 */
+	private marshalMapToArray (data: Map<{}, {}>): [{}, {}][] {
+		return Array.from(data);
 	}
 
 	/**
@@ -1241,6 +1459,20 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * Marshals a Map into an Object.
+	 * @param {Map<{}, {}>} data
+	 * @returns {object}
+	 */
+	private marshalMapToObject (data: Map<{}, {}>): { [key: number]: {} } {
+		const obj: { [key: number]: {} } = {};
+		for (const entry of data.entries()) {
+			const [key, value] = entry;
+			obj[<any>key] = value;
+		}
+		return obj;
+	}
+
+	/**
 	 * Marshals a Set into an Object.
 	 * @param {Set<T>} data
 	 * @returns {object}
@@ -1273,6 +1505,28 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * Marshals the given data, whatever the type, into a Map.
+	 * @param {T} data
+	 * @returns {Map<{}|null|?, {}|null|?>|null}
+	 */
+	private marshalToMap<T> (data: T): Map<{}|null|undefined, {}|null|undefined>|null {
+		if (data === undefined) return this.marshalUndefinedToMap(data);
+		if (data === null) return this.marshalNullToMap(data);
+		if (data instanceof Map) return data;
+		if (this.typeDetector.isBoolean(data)) return this.marshalBooleanToMap(data);
+		if (this.typeDetector.isClassConstructor(data)) return this.marshalConstructorToMap(data);
+		if (this.typeDetector.isClassInstance(data)) return this.marshalClassToMap(data);
+		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToMap(data);
+		if (this.typeDetector.isString(data))  return this.marshalStringToMap(data);
+		if (typeof data === "symbol") return this.marshalSymbolToMap(data);
+		if (data instanceof Set)     return this.marshalSetToMap(data);
+		if (Array.isArray(data))   return this.marshalArrayToMap(data);
+		if (this.typeDetector.isObject(data))  return this.marshalObjectToMap(data);
+		if (this.typeDetector.isNumber(data))  return this.marshalNumberToMap(data);
+		return data == null ? null : data;
+	}
+
+	/**
 	 * Marshals the given data, whatever the type, into a constructor.
 	 * @param {T} data
 	 * @returns {Function|null}
@@ -1286,6 +1540,7 @@ export class Marshaller implements IMarshaller {
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToConstructor(data);
 		if (this.typeDetector.isString(data))  return this.marshalStringToConstructor(data);
 		if (typeof data === "symbol") return this.marshalSymbolToConstructor(data);
+		if (data instanceof Map) return this.marshalMapToConstructor(data);
 		if (data instanceof Set)     return this.marshalSetToConstructor(data);
 		if (Array.isArray(data))   return this.marshalArrayToConstructor(data);
 		if (this.typeDetector.isObject(data))  return this.marshalObjectToConstructor(data);
@@ -1307,6 +1562,7 @@ export class Marshaller implements IMarshaller {
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToClass(data);
 		if (this.typeDetector.isString(data))  return this.marshalStringToClass(data);
 		if (typeof data === "symbol") return this.marshalSymbolToClass(data);
+		if (data instanceof Map) return this.marshalMapToClass(data);
 		if (data instanceof Set)     return this.marshalSetToClass(data);
 		if (Array.isArray(data))   return this.marshalArrayToClass(data);
 		if (this.typeDetector.isObject(data))  return this.marshalObjectToClass(data);
@@ -1328,6 +1584,7 @@ export class Marshaller implements IMarshaller {
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToBoolean(data);
 		if (this.typeDetector.isString(data))  return this.marshalStringToBoolean(data);
 		if (typeof data === "symbol") return this.marshalSymbolToBoolean(data);
+		if (data instanceof Map) return this.marshalMapToBoolean(data);
 		if (data instanceof Set)     return this.marshalSetToBoolean(data);
 		if (Array.isArray(data))   return this.marshalArrayToBoolean(data);
 		if (this.typeDetector.isObject(data))  return this.marshalObjectToBoolean(data);
@@ -1349,6 +1606,7 @@ export class Marshaller implements IMarshaller {
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToNumber(data);
 		if (this.typeDetector.isString(data))  return this.marshalStringToNumber(data);
 		if (typeof data === "symbol") return this.marshalSymbolToNumber(data);
+		if (data instanceof Map) return this.marshalMapToNumber(data);
 		if (data instanceof Set)     return this.marshalSetToNumber(data);
 		if (Array.isArray(data))   return this.marshalArrayToNumber(data);
 		if (this.typeDetector.isObject(data))  return this.marshalObjectToNumber(data);
@@ -1369,6 +1627,7 @@ export class Marshaller implements IMarshaller {
 		if (this.typeDetector.isClassInstance(data)) return this.marshalClassToSymbol(data);
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToSymbol(data);
 		if (this.typeDetector.isString(data)) return this.marshalStringToSymbol(data);
+		if (data instanceof Map) return this.marshalMapToSymbol(data);
 		if (data instanceof Set)      return this.marshalSetToSymbol(data);
 		if (Array.isArray(data))    return this.marshalArrayToSymbol(data);
 		if (this.typeDetector.isObject(data))  return this.marshalObjectToSymbol(data);
@@ -1392,6 +1651,7 @@ export class Marshaller implements IMarshaller {
 		if (this.typeDetector.isClassInstance(data)) return this.marshalClassToString(data);
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToString(data);
 		if (typeof data === "symbol") return this.marshalSymbolToString(data);
+		if (data instanceof Map) return this.marshalMapToString(data);
 		if (data instanceof Set)      return this.marshalSetToString(data);
 		if (Array.isArray(data))    return this.marshalArrayToString(data);
 		if (this.typeDetector.isObject(data))  return this.marshalObjectToString(data);
@@ -1414,6 +1674,7 @@ export class Marshaller implements IMarshaller {
 		if (this.typeDetector.isFunction(data)) return data;
 		if (this.typeDetector.isString(data)) return this.marshalStringToFunction(data);
 		if (typeof data === "symbol") return this.marshalSymbolToFunction(data);
+		if (data instanceof Map) return this.marshalMapToFunction(data);
 		if (data instanceof Set)      return this.marshalSetToFunction(data);
 		if (Array.isArray(data))    return this.marshalArrayToFunction(data);
 		if (this.typeDetector.isObject(data))  return this.marshalObjectToFunction(data);
@@ -1431,6 +1692,7 @@ export class Marshaller implements IMarshaller {
 	private marshalToSet<T> (data: T): Set<{}|null|undefined>|null {
 		if (data === undefined) return this.marshalUndefinedToSet(data);
 		if (data === null) return this.marshalNullToSet(data);
+		if (data instanceof Map) return this.marshalMapToSet(data);
 		if (data instanceof Set)      return data;
 		if (this.typeDetector.isString(data))   return this.marshalStringToSet(data);
 		if (this.typeDetector.isClassConstructor(data)) return this.marshalConstructorToSet(<Function>data);
@@ -1458,6 +1720,7 @@ export class Marshaller implements IMarshaller {
 		if (this.typeDetector.isClassInstance(data)) return this.marshalClassToArray(data);
 		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToArray(data);
 		if (typeof data === "symbol") return this.marshalSymbolToArray(data);
+		if (data instanceof Map) return this.marshalMapToArray(data);
 		if (data instanceof Set)      return this.marshalSetToArray(data);
 		if (this.typeDetector.isObject(data))    return this.marshalObjectToArray(data);
 		if (this.typeDetector.isBoolean(data))  return this.marshalBooleanToArray(data);
@@ -1480,6 +1743,7 @@ export class Marshaller implements IMarshaller {
 		if (Array.isArray(data))    return this.marshalArrayToObject(data);
 		if (typeof data === "symbol") return this.marshalSymbolToObject(data);
 		if (this.typeDetector.isString(data))   return this.marshalStringToObject(data);
+		if (data instanceof Map) return this.marshalMapToObject(data);
 		if (data instanceof Set)      return this.marshalSetToObject(data);
 		if (this.typeDetector.isBoolean(data))  return this.marshalBooleanToObject(data);
 		if (this.typeDetector.isNumber(data))   return this.marshalNumberToObject(data);
@@ -1501,6 +1765,7 @@ export class Marshaller implements IMarshaller {
 		if (Array.isArray(data))    return this.marshalArrayToNull(data);
 		if (typeof data === "symbol") return this.marshalSymbolToNull(data);
 		if (this.typeDetector.isString(data))   return this.marshalStringToNull(data);
+		if (data instanceof Map) return this.marshalMapToNull(data);
 		if (data instanceof Set)      return this.marshalSetToNull(data);
 		if (this.typeDetector.isBoolean(data))  return this.marshalBooleanToNull(data);
 		if (this.typeDetector.isNumber(data))   return this.marshalNumberToNull(data);
@@ -1603,6 +1868,7 @@ export class Marshaller implements IMarshaller {
 		if (typeof to === <any>"constructor" || this.typeDetector.isClassConstructor(to)) return this.marshalToConstructor(data);
 		if (typeof to === <any>"class" || this.typeDetector.isClassInstance(to)) return this.marshalToClass(data);
 		if (this.typeDetector.isString(to) || to === String) return this.marshalToString(data);
+		if (to instanceof Map || to === Map) return this.marshalToMap(data);
 		if (to instanceof Set || to === Set) return this.marshalToSet(data);
 		if (Array.isArray(to) || to === Array) return this.marshalToArray(data);
 		if (this.typeDetector.isObject(to) || to === Object) return this.marshalToObject(data);

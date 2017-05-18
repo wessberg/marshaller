@@ -19,7 +19,7 @@ test(`'marshal()' string -> object. #1`, t => {
 		}
 	`;
 
-	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, Object), expected);
+	t.deepEqual(marshaller.marshal(input, Object), expected);
 });
 
 test(`'marshal()' string -> object. #2`, t => {

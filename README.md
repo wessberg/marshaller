@@ -49,12 +49,16 @@ The marshalled version of the input data.
 * [X] Casting from/to `undefined`.
 * [ ] Casting from/to `Date`.
 * [X] Casting from/to `Function`
-* [ ] Casting from/to `Map`
+* [X] Casting from/to `Map`
 * [ ] Casting from/to `WeakSet`
 * [ ] Casting from/to `WeakMap`
 * [ ] Casting from/to `RegExp`
 
 ## Changelog:
+
+**v1.0.22**:
+
+- Added mapping to/from `Map`.
 
 **v1.0.21**:
 
