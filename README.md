@@ -4,6 +4,11 @@
 ## Installation
 Simply do: `npm install @wessberg/marshaller`.
 
+## DISCLAIMER
+
+This is an early version. There are still some data types that aren't fully handled.
+You can use this now in production, but keep track of the roadmap inside this readme.
+
 ## Usage
 ```javascript
 const marshaller = new Marshaller();
@@ -55,6 +60,10 @@ The marshalled version of the input data.
 * [ ] Casting from/to `RegExp`
 
 ## Changelog:
+
+**v1.0.23**:
+
+- Added a disclaimer to the README.
 
 **v1.0.22**:
 
