@@ -12,6 +12,8 @@ export class Marshaller implements IMarshaller {
 	private static readonly FUNCTION_REGEX_1: RegExp = /^\(*function\s*\w*\s*\([^)]*\)\s*{/;
 	private static readonly FUNCTION_REGEX_2: RegExp = /^\(+[^)]*\)\s*=>/;
 	private static readonly FUNCTION_REGEX_3: RegExp = /^\w+\s*=>/;
+	private static readonly ISO_STRING_REGEX: RegExp = /(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))/;
+	private static readonly UTC_STRING_REGEX: RegExp = /(\w{3}), (\d{2}) (\w{3}) (\d{4}) ((\d{2}):(\d{2}):(\d{2})) GMT/;
 
 	constructor (private typeDetector: ITypeDetector) {
 	}
@@ -38,113 +40,141 @@ export class Marshaller implements IMarshaller {
 		return this.typeDetector.getTypeof(data);
 	}
 
-	/**
-	 * Marshals a string into null.
-	 * @param {string} _
-	 * @returns {null}
-	 */
-	private marshalStringToNull (_: string|String): null {
-		return null;
-	}
 
 	/**
-	 * Marshals a map into null.
-	 * @param {Map<{}, {}>} _
-	 * @returns {null}
+	 * Marshals a string into a Date.
+	 * @param {string|String} data
+	 * @returns {Date}
 	 */
-	private marshalMapToNull (_: Map<{}, {}>): null {
-		return null;
+	private marshalStringToDate (data: string|String): Date {
+		const primitive = data instanceof String ? data.valueOf() : data;
+		if (Marshaller.ISO_STRING_REGEX.test(primitive)) return new Date(data);
+		if (Marshaller.UTC_STRING_REGEX.test(primitive)) return new Date(data);
+		return new Date(data);
 	}
 
+
 	/**
-	 * Marshals a class into null.
+	 * Marshals a class into a Date.
 	 * @param {{}} _
-	 * @returns {null}
+	 * @returns {Date}
 	 */
-	private marshalClassToNull (_: {}): null {
-		return null;
+	private marshalClassToDate (_: {}): Date {
+		return new Date();
 	}
 
 	/**
-	 * Marshals a constructor into null.
-	 * @param {Function} _
-	 * @returns {null}
+	 * Marshals a map into a Date.
+	 * @param {Map<{}, {}>} _
+	 * @returns {Date}
 	 */
-	private marshalConstructorToNull (_: {}): null {
-		return null;
+	private marshalMapToDate (_: Map<{}, {}>): Date {
+		return new Date();
 	}
 
 	/**
-	 * Marshals undefined into null.
-	 * @param {?} _
-	 * @returns {null}
+	 * Marshals a constructor into a Date.
+	 * @param {{}} _
+	 * @returns {Date}
 	 */
-	private marshalUndefinedToNull (_: undefined): null {
-		return null;
+	private marshalConstructorToDate (_: {}): Date {
+		return new Date();
 	}
 
 	/**
-	 * Marshals an object into null.
-	 * @param {object} _
-	 * @returns {null}
-	 */
-	private marshalObjectToNull<T> (_: { [key: string]: T }): null {
-		return null;
-	}
-
-	/**
-	 * Marshals a set into null.
+	 * Marshals a set into a Date.
 	 * @param {Set<T>} _
-	 * @returns {string}
+	 * @returns {Date}
 	 */
-	private marshalSetToNull<T> (_: Set<T>): null {
-		return null;
+	private marshalSetToDate<T> (_: Set<T>): Date {
+		return new Date();
 	}
 
 	/**
-	 * Marshals a symbol into null.
-	 * @param {symbol} _
-	 * @returns {null}
+	 * Marshals undefined into a Date.
+	 * @param {?} _
+	 * @returns {Date}
 	 */
-	private marshalSymbolToNull (_: symbol): null {
-		return null;
+	private marshalUndefinedToDate (_: undefined): Date {
+		return new Date();
 	}
 
 	/**
-	 * Marshals a boolean into null.
+	 * Marshals null into a Date.
+	 * @param {null} _
+	 * @returns {Date}
+	 */
+	private marshalNullToDate (_: null): Date {
+		return new Date();
+	}
+
+	/**
+	 * Marshals a symbol into a Date.
+	 * @param {symbol} data
+	 * @returns {Date}
+	 */
+	private marshalSymbolToDate (data: symbol): Date {
+		const match = data.toString().match(Marshaller.SYMBOL_REGEX);
+		if (match == null) return new Date();
+		return this.marshalStringToDate(match[1]);
+	}
+
+	/**
+	 * Marshals an object into a Date.
+	 * @param {object} data
+	 * @returns {Date}
+	 */
+	private marshalObjectToDate<T> (data: { [key: string]: T }): Date {
+		const keyed = data[0];
+		if (keyed instanceof Date) return keyed;
+		return new Date();
+	}
+
+	/**
+	 * Marshals a boolean into a Date.
 	 * @param {boolean} _
-	 * @returns {null}
+	 * @returns {Date}
 	 */
-	private marshalBooleanToNull (_: boolean|Boolean): null {
-		return null;
+	private marshalBooleanToDate (_: boolean|Boolean): Date {
+		return new Date();
 	}
 
 	/**
-	 * Marshals a number into null.
-	 * @param {number} _
-	 * @returns {null}
+	 * Marshals a number into a Date.
+	 * @param {number|Number} data
+	 * @returns {Date}
 	 */
-	private marshalNumberToNull (_: number|Number): null {
-		return null;
+	private marshalNumberToDate (data: number|Number): Date {
+		const primitive = data instanceof Number ? data.valueOf() : data;
+		return new Date(primitive);
 	}
 
 	/**
-	 * Marshals an array into null.
-	 * @param {T[]} _
-	 * @returns {null}
+	 * Marshals an array into a Date.
+	 * @param {T[]} data
+	 * @returns {Date}
 	 */
-	private marshalArrayToNull<T> (_: T[]): null {
-		return null;
+	private marshalArrayToDate<T> (data: T[]): Date {
+		const [first] = data;
+		if (first instanceof Date) return first;
+		return new Date();
 	}
 
 	/**
-	 * Marshals a function into null.
-	 * @param {Function} _
-	 * @returns {null}
+	 * Marshals a function into a Date.
+	 * @param {Function} data
+	 * @returns {Date}
 	 */
-	private marshalFunctionToNull (_: Function): null {
-		return null;
+	private marshalFunctionToDate (data: Function): Date {
+		try {
+			const result = data();
+			if (result instanceof Date) return result;
+			return new Date();
+		} catch (ex) {
+			return new Date();
+		}
 	}
+
 
 	/**
 	 * Marshals a class into a string.
@@ -153,6 +183,15 @@ export class Marshaller implements IMarshaller {
 	 */
 	private marshalClassToString (data: {}): string {
 		return `new (${this.marshalToString(this.marshalClassToConstructor(data))})()`;
+	}
+
+	/**
+	 * Marshals a Date into a string.
+	 * @param {Date} data
+	 * @returns {string}
+	 */
+	private marshalDateToString (data: Date): string {
+		return data.toISOString();
 	}
 
 	/**
@@ -288,6 +327,16 @@ export class Marshaller implements IMarshaller {
 	 */
 	private marshalSymbolToClass (data: symbol): {} {
 		const ctor = <new ()=> {}>this.marshalSymbolToConstructor(data);
+		return new ctor();
+	}
+
+	/**
+	 * Marshals a Date into a class.
+	 * @param {Date} data
+	 * @returns {{}}
+	 */
+	private marshalDateToClass (data: Date): {} {
+		const ctor = <new ()=> {}>this.marshalDateToConstructor(data);
 		return new ctor();
 	}
 
@@ -465,7 +514,6 @@ export class Marshaller implements IMarshaller {
 	 */
 	private marshalUndefinedToConstructor (_: undefined): Function {
 		class Class {}
-
 		return Class;
 	}
 
@@ -495,10 +543,20 @@ export class Marshaller implements IMarshaller {
 
 	/**
 	 * Marshals a boolean into a constructor.
-	 * @param {boolean} data
+	 * @param {boolean|Boolean} _
 	 * @returns {Function}
 	 */
 	private marshalBooleanToConstructor (_: boolean|Boolean): Function {
+		class Class {}
+		return Class;
+	}
+
+	/**
+	 * Marshals a Date into a constructor.
+	 * @param {Date} _
+	 * @returns {Function}
+	 */
+	private marshalDateToConstructor (_: Date): Function {
 		class Class {}
 		return Class;
 	}
@@ -586,6 +644,15 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * Marshals a Date into a function.
+	 * @param {Date} data
+	 * @returns {Function}
+	 */
+	private marshalDateToFunction (data: Date): Function {
+		return () => data;
+	}
+
+	/**
 	 * Marshals a class into a function.
 	 * @param {symbol} data
 	 * @returns {Function}
@@ -668,6 +735,15 @@ export class Marshaller implements IMarshaller {
 	 */
 	private marshalClassToBoolean (_: {}): boolean {
 		return true;
+	}
+
+	/**
+	 * Marshals a date into a boolean.
+	 * @param {Date} data
+	 * @returns {boolean}
+	 */
+	private marshalDateToBoolean (data: Date): boolean {
+		return this.marshalDateToNumber(data) > 0;
 	}
 
 	/**
@@ -785,6 +861,15 @@ export class Marshaller implements IMarshaller {
 	 */
 	private marshalUndefinedToSymbol (_: undefined): symbol {
 		return Symbol(this.marshalUndefinedToString(undefined));
+	}
+
+	/**
+	 * Marshals Date into a symbol.
+	 * @param {Date} data
+	 * @returns {symbol}
+	 */
+	private marshalDateToSymbol (data: Date): symbol {
+		return Symbol(this.marshalDateToString(data));
 	}
 
 	/**
@@ -935,6 +1020,15 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * Marshals a Date into a number.
+	 * @param {Date} data
+	 * @returns {number}
+	 */
+	private marshalDateToNumber (data: Date): number {
+		return data.getTime();
+	}
+
+	/**
 	 * Marshals a symbol into a number.
 	 * @param {symbol} data
 	 * @returns {number}
@@ -1040,6 +1134,15 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * Marshals a Date into a Set.
+	 * @param {Date} data
+	 * @returns {Set<Date>}
+	 */
+	private marshalDateToSet (data: Date): Set<Date> {
+		return new Set([data]);
+	}
+
+	/**
 	 * Marshals a symbol into a Set.
 	 * @param {symbol} data
 	 * @returns {Set<string>}
@@ -1093,6 +1196,15 @@ export class Marshaller implements IMarshaller {
 	private marshalNumberToSet (data: number|Number): Set<number> {
 		const primitive = data instanceof Number ? data.valueOf() : data;
 		return new Set([primitive]);
+	}
+
+	/**
+	 * Marshals a Map into a Set.
+	 * @param {Map<{}, {}>} data
+	 * @returns {Set<[{}, {}]>}
+	 */
+	private marshalMapToSet (data: Map<{}, {}>): Set<[{}, {}]> {
+		return new Set(data);
 	}
 
 	/**
@@ -1164,6 +1276,15 @@ export class Marshaller implements IMarshaller {
 	 * @returns {Map<symbol, symbol>}
 	 */
 	private marshalSymbolToMap (data: symbol): Map<Symbol, Symbol> {
+		return new Map([[data, data]]);
+	}
+
+	/**
+	 * Marshals a Date into a Map.
+	 * @param {Date} data
+	 * @returns {Map<Date, Date>}
+	 */
+	private marshalDateToMap (data: Date): Map<Date, Date> {
 		return new Map([[data, data]]);
 	}
 
@@ -1303,12 +1424,12 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
-	 * Marshals a Map into a Set.
-	 * @param {Map<{}, {}>} data
-	 * @returns {Set<[{}, {}]>}
+	 * Marshals a Date into an array.
+	 * @param {Date} data
+	 * @returns {Date[]}
 	 */
-	private marshalMapToSet (data: Map<{}, {}>): Set<[{}, {}]> {
-		return new Set(data);
+	private marshalDateToArray (data: Date): Date[] {
+		return [data];
 	}
 
 	/**
@@ -1505,6 +1626,15 @@ export class Marshaller implements IMarshaller {
 	}
 
 	/**
+	 * Marshals a Date into an Object.
+	 * @param {Date} data
+	 * @returns {object}
+	 */
+	private marshalDateToObject (data: Date): { [key: number]: Date } {
+		return {0: data};
+	}
+
+	/**
 	 * Marshals the given data, whatever the type, into a Map.
 	 * @param {T} data
 	 * @returns {Map<{}|null|?, {}|null|?>|null}
@@ -1520,6 +1650,7 @@ export class Marshaller implements IMarshaller {
 		if (this.typeDetector.isString(data))  return this.marshalStringToMap(data);
 		if (typeof data === "symbol") return this.marshalSymbolToMap(data);
 		if (data instanceof Set)     return this.marshalSetToMap(data);
+		if (data instanceof Date) return this.marshalDateToMap(data);
 		if (Array.isArray(data))   return this.marshalArrayToMap(data);
 		if (this.typeDetector.isObject(data))  return this.marshalObjectToMap(data);
 		if (this.typeDetector.isNumber(data))  return this.marshalNumberToMap(data);
@@ -1542,6 +1673,7 @@ export class Marshaller implements IMarshaller {
 		if (typeof data === "symbol") return this.marshalSymbolToConstructor(data);
 		if (data instanceof Map) return this.marshalMapToConstructor(data);
 		if (data instanceof Set)     return this.marshalSetToConstructor(data);
+		if (data instanceof Date) return this.marshalDateToConstructor(data);
 		if (Array.isArray(data))   return this.marshalArrayToConstructor(data);
 		if (this.typeDetector.isObject(data))  return this.marshalObjectToConstructor(data);
 		if (this.typeDetector.isNumber(data))  return this.marshalNumberToConstructor(data);
@@ -1564,6 +1696,7 @@ export class Marshaller implements IMarshaller {
 		if (typeof data === "symbol") return this.marshalSymbolToClass(data);
 		if (data instanceof Map) return this.marshalMapToClass(data);
 		if (data instanceof Set)     return this.marshalSetToClass(data);
+		if (data instanceof Date) return this.marshalDateToClass(data);
 		if (Array.isArray(data))   return this.marshalArrayToClass(data);
 		if (this.typeDetector.isObject(data))  return this.marshalObjectToClass(data);
 		if (this.typeDetector.isNumber(data))  return this.marshalNumberToClass(data);
@@ -1586,6 +1719,7 @@ export class Marshaller implements IMarshaller {
 		if (typeof data === "symbol") return this.marshalSymbolToBoolean(data);
 		if (data instanceof Map) return this.marshalMapToBoolean(data);
 		if (data instanceof Set)     return this.marshalSetToBoolean(data);
+		if (data instanceof Date) return this.marshalDateToBoolean(data);
 		if (Array.isArray(data))   return this.marshalArrayToBoolean(data);
 		if (this.typeDetector.isObject(data))  return this.marshalObjectToBoolean(data);
 		if (this.typeDetector.isNumber(data))  return this.marshalNumberToBoolean(data);
@@ -1608,6 +1742,7 @@ export class Marshaller implements IMarshaller {
 		if (typeof data === "symbol") return this.marshalSymbolToNumber(data);
 		if (data instanceof Map) return this.marshalMapToNumber(data);
 		if (data instanceof Set)     return this.marshalSetToNumber(data);
+		if (data instanceof Date) return this.marshalDateToNumber(data);
 		if (Array.isArray(data))   return this.marshalArrayToNumber(data);
 		if (this.typeDetector.isObject(data))  return this.marshalObjectToNumber(data);
 		if (this.typeDetector.isBoolean(data)) return this.marshalBooleanToNumber(data);
@@ -1629,6 +1764,7 @@ export class Marshaller implements IMarshaller {
 		if (this.typeDetector.isString(data)) return this.marshalStringToSymbol(data);
 		if (data instanceof Map) return this.marshalMapToSymbol(data);
 		if (data instanceof Set)      return this.marshalSetToSymbol(data);
+		if (data instanceof Date) return this.marshalDateToSymbol(data);
 		if (Array.isArray(data))    return this.marshalArrayToSymbol(data);
 		if (this.typeDetector.isObject(data))  return this.marshalObjectToSymbol(data);
 		if (this.typeDetector.isBoolean(data))  return this.marshalBooleanToSymbol(data);
@@ -1653,6 +1789,7 @@ export class Marshaller implements IMarshaller {
 		if (typeof data === "symbol") return this.marshalSymbolToString(data);
 		if (data instanceof Map) return this.marshalMapToString(data);
 		if (data instanceof Set)      return this.marshalSetToString(data);
+		if (data instanceof Date) return this.marshalDateToString(data);
 		if (Array.isArray(data))    return this.marshalArrayToString(data);
 		if (this.typeDetector.isObject(data))  return this.marshalObjectToString(data);
 		if (this.typeDetector.isBoolean(data))  return this.marshalBooleanToString(data);
@@ -1676,6 +1813,7 @@ export class Marshaller implements IMarshaller {
 		if (typeof data === "symbol") return this.marshalSymbolToFunction(data);
 		if (data instanceof Map) return this.marshalMapToFunction(data);
 		if (data instanceof Set)      return this.marshalSetToFunction(data);
+		if (data instanceof Date) return this.marshalDateToFunction(data);
 		if (Array.isArray(data))    return this.marshalArrayToFunction(data);
 		if (this.typeDetector.isObject(data))  return this.marshalObjectToFunction(data);
 		if (this.typeDetector.isBoolean(data))  return this.marshalBooleanToFunction(data);
@@ -1694,6 +1832,7 @@ export class Marshaller implements IMarshaller {
 		if (data === null) return this.marshalNullToSet(data);
 		if (data instanceof Map) return this.marshalMapToSet(data);
 		if (data instanceof Set)      return data;
+		if (data instanceof Date) return this.marshalDateToSet(data);
 		if (this.typeDetector.isString(data))   return this.marshalStringToSet(data);
 		if (this.typeDetector.isClassConstructor(data)) return this.marshalConstructorToSet(<Function>data);
 		if (this.typeDetector.isClassInstance(data)) return this.marshalClassToSet(data);
@@ -1704,6 +1843,29 @@ export class Marshaller implements IMarshaller {
 		if (this.typeDetector.isBoolean(data))  return this.marshalBooleanToSet(data);
 		if (this.typeDetector.isNumber(data))   return this.marshalNumberToSet(data);
 		return data == null ? null : new Set();
+	}
+
+	/**
+	 * Marshals the given data, whatever the type, into a Date.
+	 * @param {T} data
+	 * @returns {Date|null}
+	 */
+	private marshalToDate<T> (data: T): Date|null {
+		if (data === undefined) return this.marshalUndefinedToDate(data);
+		if (data === null) return this.marshalNullToDate(data);
+		if (data instanceof Date) return data;
+		if (Array.isArray(data))    return this.marshalArrayToDate(data);
+		if (this.typeDetector.isString(data))   return this.marshalStringToDate(data);
+		if (this.typeDetector.isClassConstructor(data)) return this.marshalConstructorToDate(<Function>data);
+		if (this.typeDetector.isClassInstance(data)) return this.marshalClassToDate(data);
+		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToDate(data);
+		if (typeof data === "symbol") return this.marshalSymbolToDate(data);
+		if (data instanceof Map) return this.marshalMapToDate(data);
+		if (data instanceof Set)      return this.marshalSetToDate(data);
+		if (this.typeDetector.isObject(data))    return this.marshalObjectToDate(data);
+		if (this.typeDetector.isBoolean(data))  return this.marshalBooleanToDate(data);
+		if (this.typeDetector.isNumber(data))   return this.marshalNumberToDate(data);
+		return data == null ? null : data;
 	}
 
 	/**
@@ -1722,6 +1884,7 @@ export class Marshaller implements IMarshaller {
 		if (typeof data === "symbol") return this.marshalSymbolToArray(data);
 		if (data instanceof Map) return this.marshalMapToArray(data);
 		if (data instanceof Set)      return this.marshalSetToArray(data);
+		if (data instanceof Date) return this.marshalDateToArray(data);
 		if (this.typeDetector.isObject(data))    return this.marshalObjectToArray(data);
 		if (this.typeDetector.isBoolean(data))  return this.marshalBooleanToArray(data);
 		if (this.typeDetector.isNumber(data))   return this.marshalNumberToArray(data);
@@ -1745,6 +1908,7 @@ export class Marshaller implements IMarshaller {
 		if (this.typeDetector.isString(data))   return this.marshalStringToObject(data);
 		if (data instanceof Map) return this.marshalMapToObject(data);
 		if (data instanceof Set)      return this.marshalSetToObject(data);
+		if (data instanceof Date) return this.marshalDateToObject(data);
 		if (this.typeDetector.isBoolean(data))  return this.marshalBooleanToObject(data);
 		if (this.typeDetector.isNumber(data))   return this.marshalNumberToObject(data);
 		return data == null ? null : {};
@@ -1752,23 +1916,10 @@ export class Marshaller implements IMarshaller {
 
 	/**
 	 * Marshals the given data, whatever the type, into null.
-	 * @param {T} data
+	 * @param {T} _
 	 * @returns {null}
 	 */
-	private marshalToNull<T> (data: T): null {
-		if (data === undefined) return this.marshalUndefinedToNull(data);
-		if (data == null) return null;
-		if (this.typeDetector.isObject(data))    return this.marshalObjectToNull(data);
-		if (this.typeDetector.isClassConstructor(data)) return this.marshalConstructorToNull(<Function>data);
-		if (this.typeDetector.isClassInstance(data)) return this.marshalClassToNull(data);
-		if (this.typeDetector.isFunction(data)) return this.marshalFunctionToNull(data);
-		if (Array.isArray(data))    return this.marshalArrayToNull(data);
-		if (typeof data === "symbol") return this.marshalSymbolToNull(data);
-		if (this.typeDetector.isString(data))   return this.marshalStringToNull(data);
-		if (data instanceof Map) return this.marshalMapToNull(data);
-		if (data instanceof Set)      return this.marshalSetToNull(data);
-		if (this.typeDetector.isBoolean(data))  return this.marshalBooleanToNull(data);
-		if (this.typeDetector.isNumber(data))   return this.marshalNumberToNull(data);
+	private marshalToNull<T> (_: T): null {
 		return null;
 	}
 
@@ -1825,15 +1976,27 @@ export class Marshaller implements IMarshaller {
 		if (primitive === "NaN") return NaN;
 		if (primitive === "Infinity") return Infinity;
 
+		// It might be a class
 		if (Marshaller.CLASS_INSTANCE_REGEX.test(primitive)) {
 			return this.marshalStringToClass(primitive);
 		}
 
+		// It might be a Symbol
 		if (Marshaller.SYMBOL_REGEX.test(primitive)) {
 			return this.marshalStringToSymbol(primitive);
 		}
 
+		// It might be a constructor
 		if (primitive.trim().startsWith("class ")) return this.marshalStringToConstructor(data);
+
+		// It might be Date
+		if (Marshaller.ISO_STRING_REGEX.test(primitive)) {
+			return this.marshalStringToDate(primitive);
+		}
+
+		if (Marshaller.UTC_STRING_REGEX.test(primitive)) {
+			return this.marshalStringToDate(primitive);
+		}
 
 		// It might be a number.
 		const toNum = Number.parseFloat(primitive);
@@ -1842,16 +2005,20 @@ export class Marshaller implements IMarshaller {
 			return toNum;
 		}
 
+		// It might be a function
 		if (Marshaller.FUNCTION_REGEX_1.test(primitive.trim())) return new Function(`return ${primitive}`)();
 		if (Marshaller.FUNCTION_REGEX_2.test(primitive.trim())) return new Function(`return ${primitive}`)();
 		if (Marshaller.FUNCTION_REGEX_3.test(primitive.trim())) return new Function(`return ${primitive}`)();
 
+		// It might be an object
 		const asObj = this.attemptStringToObjectConversion(primitive);
 		if (asObj != null) return asObj;
 
+		// It might be an array.
 		try {
 			return JSON.parse(primitive);
 		} catch (e) {
+			// Fall back to the primitive value itself.
 			return primitive;
 		}
 	}
@@ -1870,6 +2037,7 @@ export class Marshaller implements IMarshaller {
 		if (this.typeDetector.isString(to) || to === String) return this.marshalToString(data);
 		if (to instanceof Map || to === Map) return this.marshalToMap(data);
 		if (to instanceof Set || to === Set) return this.marshalToSet(data);
+		if (to instanceof Date || to === Date) return this.marshalToDate(data);
 		if (Array.isArray(to) || to === Array) return this.marshalToArray(data);
 		if (this.typeDetector.isObject(to) || to === Object) return this.marshalToObject(data);
 		if (this.typeDetector.isBoolean(to) || to === Boolean) return this.marshalToBoolean(data);

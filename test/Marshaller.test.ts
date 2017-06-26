@@ -185,6 +185,22 @@ test(`'marshal()' string -> best guess. #8`, t => {
 	t.true(typeDetector.isObject(marshalled));
 });
 
+test(`'marshal()' string -> best guess. #9`, t => {
+	const date = new Date();
+	const input = date.toISOString();
+
+	const marshalled = marshaller.marshal(input);
+	t.true(marshalled instanceof Date);
+});
+
+test(`'marshal()' string -> best guess. #10`, t => {
+	const date = new Date();
+	const input = date.toUTCString();
+
+	const marshalled = marshaller.marshal(input);
+	t.true(marshalled instanceof Date);
+});
+
 test(`'marshal()' object -> string. #1`, t => {
 	const expected = "{\"a\": 2}";
 	const input = {
@@ -320,4 +336,18 @@ test(`'marshal()' class -> string. #2`, t => {
 	const input = new A(1, 2);
 	const result = <string>marshaller.marshal(input, expected);
 	t.deepEqual(result, expected);
+});
+
+test(`'marshal()' Date -> string. #1`, t => {
+	const date = new Date();
+	const expected = date.toISOString();
+
+	t.deepEqual(marshaller.marshal(date, expected), expected);
+});
+
+test(`'marshal()' string -> Date. #1`, t => {
+	const expected = new Date();
+
+	const marshalled = <Date>marshaller.marshal(expected.toISOString(), Date);
+	t.deepEqual(marshalled.getTime(), expected.getTime());
 });

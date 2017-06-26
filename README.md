@@ -52,7 +52,7 @@ The marshalled version of the input data.
 * [X] Casting from/to `constructor`.
 * [X] Casting from/to `null`.
 * [X] Casting from/to `undefined`.
-* [ ] Casting from/to `Date`.
+* [X] Casting from/to `Date`.
 * [X] Casting from/to `Function`
 * [X] Casting from/to `Map`
 * [ ] Casting from/to `WeakSet`
@@ -60,6 +60,10 @@ The marshalled version of the input data.
 * [ ] Casting from/to `RegExp`
 
 ## Changelog:
+
+**v1.0.24**:
+
+- Added mapping to/from `Date`.
 
 **v1.0.23**:
 
