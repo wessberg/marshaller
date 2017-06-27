@@ -144,7 +144,7 @@ The (*) means that the types cannot be restored to their initial state since the
 
 ## Changelog:
 
-**v1.1.0**:
+**v2.0.0**:
 
 - Major overhaul. Where the Marshaller could previously map between any types, the Marshaller now has a sharp focus on being able to marshal any data to a string representation and be able to unmarshal the data back into the native representation in a non-destructive operation (e.g. all data should be re-retrievable).
 
