@@ -1,44 +1,125 @@
 # Marshaller [![NPM version][npm-image]][npm-url]
-> A class that maps between a variety of data types.
+> A class that can map various data types back and forth between a string representation that can be transferred over the wire or evaluated using eval() or new Function() expressions and back to the native environment. This is equivalent to `JSON.parse()` and `JSON.stringify()` except with a much broader scope.
 
 ## Installation
 Simply do: `npm install @wessberg/marshaller`.
 
 ## DISCLAIMER
 
-This is an early version. There are still some data types that aren't fully handled.
-You can use this now in production, but keep track of the roadmap inside this readme.
+This is an early version. There may still be bugs. If you run into some, please submit an issue on GitHub.
 
 ## Usage
-```javascript
+```typescript
 const marshaller = new Marshaller();
 
-marshaller.marshal("true", Boolean); // true
-marshaller.marshal("0", Boolean); // false
-marshaller.marshal([1, 2, false, true], String); // [ 1, 2, false, true]
-marshaller.marshal("Infinity"); // Auto-mapped to number - Infinity.
-marshaller.marshal<number, string>(123, "a hint") // "123", generic typecasting.
+// Convert even complex data into a string representation, for example so it can be sent over the network.
+marshaller.marshal({
+    a: 1,
+    b: new Date(),
+    c: /foo/,
+    d: [1, "1", new Set([1, 2, 3])],
+    e: new (class Foo {})
+}); // returns: {"a": 1, "b": new Date("2017-06-27T16:55:07.357Z"), "c": /foo/, "d": [1,"1",new Set([1,2,3])], "e": new (class Foo {static get __INSTANCE__VALUES_MAP () {return {}}})()}
+
+// Convert the data back into complex types for the host environment.
+const unmarshalled = marshaller.unmarshal(`{"a": 1, "b": new Date("2017-06-27T16:55:07.357Z"), "c": /foo/, "d": [1,"1",new Set([1,2,3])], "e": new (class Foo {static get __INSTANCE__VALUES_MAP () {return {}}})()}`);
+
+// The data will have proper types
+typeof unmarshalled.a === "number"; // true
+unmarshalled.b instanceof Date; // true
+unmarshalled.c instanceof RegExp; // true
+Array.isArray(unmarshalled.d); // true
+const [first, second, third] = unmarshalled.d;
+
+// The Set will have the correct entries
+third instanceof Set // true
+third.has(2) // true
+
+// Even the class instance can be reconstructed, including its members.
+unmarshalled.e instanceof Foo // true
 ```
 
-As you can see, you simply pass some arbitrary data and *optionally* the type
-you want to map to. If you don't provide any, `Marshaller` will attempt to find
-the most appropriate type to map to using heuristics. The second argument, the hint,
-accepts either a constructor for a type or a concrete instance of one.
+As you can see, there is really no limit to the kind of data you can marshall/unmarshall.
+The library was written with the primary purpose of being able to cast anything to/from a string representation
+so it could be networked, even instances of classes with mutated properties. This makes it possible to send class instances back and
+forth between a client and server.
+
+For example:
+
+### Client
+
+```typescript
+class Foo {
+	public isMutated: boolean = false;
+}
+
+const marshaller = new Marshaller();
+const instance = new Foo();
+instance.isMutated = true;
+
+// Marshal the class instance so it can be sent over the wire
+const marshalled = marshaller.marshal(instance);
+
+// Send it over HTTP...
+```
+
+### Server
+
+```typescript
+const marshaller = new Marshaller();
+
+// Upon receiving a request from the client...
+const unmarshalled = marshaller.unmarshal(marshalledPayload);
+unmarshalled instanceof Foo; // true
+unmarshalled.isMutated; // true
+```
+
+## Use cases
+
+This API is relatively low-level and allows for designing high-level APIs that abstracts away any need
+to go to a string representation and back. Some include transferring data over the network while others include
+storing data in a serialized database (such as `localStorage`).
+
+An example could be a controller for a REST API endpoint, e.g.:
+
+```typescript
+class TodoController extends Controller {
+	
+	@PUTEndpoint("/api/todos/:id")
+	async putTodoItem (todo: TodoItem) {
+    	await put("todos", todo.id, todo);
+    }
+}
+```
+
+Where the base controller unmarshals the input data before passing it on to user-facing controllers.
+There are many use cases for marshalling data though, and yours may be different.
 
 ## API
-`marshal<T, U> (data: T, hint?: U|Newable<U>): U | null|undefined`
+
+### `marshal()`
+
+`marshal<T> (data: T): string`
 
 #### Params
 ##### `data: T`
 The input data.
 
-##### `hint?: U|Newable<U>`
-An optional hint to define which data type to marshal to. If omitted, the data will be parsed
-into the type `Marshaller` finds most appropriate.
+#### Returns
+##### `string`
+The marshalled string representation of the data.
+
+### `unmarshal()`
+
+`unmarshal<T> (data: string): T|{}|null|undefined`
+
+#### Params
+##### `data: string`
+The marshalled input data
 
 #### Returns
-##### `U`
-The marshalled version of the input data.
+##### `T|{}|null|undefined`
+The unmarshalled data. Can be anything.
 
 ## Roadmap
 * [X] Casting from/to `Set`.
@@ -55,11 +136,25 @@ The marshalled version of the input data.
 * [X] Casting from/to `Date`.
 * [X] Casting from/to `Function`
 * [X] Casting from/to `Map`
-* [ ] Casting from/to `WeakSet`
-* [ ] Casting from/to `WeakMap`
-* [ ] Casting from/to `RegExp`
+* [X] Casting from/to `WeakSet` (*)
+* [X] Casting from/to `WeakMap` (*)
+* [X] Casting from/to `RegExp`
+
+The (*) means that the types cannot be restored to their initial state since the keys are weak and not iterable. There are no way of restoring the state. Instead, new instances will be created.
 
 ## Changelog:
+
+**v1.1.0**:
+
+- Major overhaul. Where the Marshaller could previously map between any types, the Marshaller now has a sharp focus on being able to marshal any data to a string representation and be able to unmarshal the data back into the native representation in a non-destructive operation (e.g. all data should be re-retrievable).
+
+- `RegExp`, `WeakMap` and `WeakSet` is now supported.
+
+- Smaller size.
+
+**v1.0.25**:
+
+- Class instances can now be marshalled to strings and marshalled back into a native representation while stile preserving the instance values that has been set over time. This allows for, among other things, sending an instance of a class over the wire and then "reassembling" the class and instance values. For the user, this feels like sending a complex class instance via HTTP.
 
 **v1.0.24**:
 

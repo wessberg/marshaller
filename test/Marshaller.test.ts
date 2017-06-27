@@ -6,7 +6,7 @@ import {GlobalObject, GlobalObjectIdentifier} from "@wessberg/globalobject";
 const typeDetector = new TypeDetector();
 const marshaller = new Marshaller(typeDetector);
 
-test(`'marshal()' string -> object. #1`, t => {
+test(`'unmarshal()' -> object #1`, t => {
 	const expected = {
 		a: 1,
 		b: 2
@@ -19,10 +19,10 @@ test(`'marshal()' string -> object. #1`, t => {
 		}
 	`;
 
-	t.deepEqual(marshaller.marshal(input, Object), expected);
+	t.deepEqual(marshaller.unmarshal(input), expected);
 });
 
-test(`'marshal()' string -> object. #2`, t => {
+test(`'unmarshal()' -> object. #2`, t => {
 	const expected = {
 		a: {
 			b: {
@@ -36,181 +36,266 @@ test(`'marshal()' string -> object. #2`, t => {
 		{a: {b: {c: "hello world!"}}, d: ["foo", "bar", true, false]}
 	`;
 
-	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, Object), expected);
+	t.deepEqual(marshaller.unmarshal(input), expected);
 });
 
-test(`'marshal()' string -> Set. #1`, t => {
-	const expected = new Set(["hello"]);
+test(`'unmarshal()' -> object. #3`, t => {
+	const input = `{"foobar": \`baz\`}`;
 
-	const input = `hello`;
-
-	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, Set), expected);
+	t.true(typeDetector.isObject(marshaller.unmarshal(input)));
 });
 
-test(`'marshal()' string -> Array. #1`, t => {
-	const expected = [1, 2, false, true, "hello", "goodbye", [1, 2, 3]];
+test(`'unmarshal()' -> object #4`, t => {
+	const input = `{"hmm": ((arg) => { return (arg === undefined ? undefined : arg)+10;})}`;
 
-	const input = `[1, 2, false, true, "hello", "goodbye", [1, 2, 3]]`;
-
-	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, Array), expected);
+	const marshalled = marshaller.unmarshal(input);
+	t.true(typeDetector.isObject(marshalled));
 });
 
-test(`'marshal()' string -> boolean. #1`, t => {
+test(`'unmarshal()' -> object #5`, t => {
+	const input = `{"global": ${GlobalObjectIdentifier}}`;
+
+	const marshalled = marshaller.unmarshal(input);
+	t.true(typeDetector.isObject(marshalled));
+});
+
+test(`'unmarshal()' -> object #6`, t => {
+	const expected = {
+		foo: false,
+		type: {
+			expression: "hello"
+		}
+	};
+
+	const input = "{\"foo\": false, \"type\": {\"expression\": `hello`}}";
+
+	t.deepEqual(marshaller.unmarshal(input), expected);
+});
+
+test(`'unmarshal()' -> Array #1`, t => {
+	const expected = [1, "2", false, true, "hello", "goodbye", [1, 2, 3]];
+
+	const input = `[1, "2", false, true, "hello", "goodbye", [1, 2, 3]]`;
+
+	const unmarshalled = marshaller.unmarshal(input);
+	t.deepEqual(unmarshalled, expected);
+});
+
+test(`'unmarshal()' -> Array #2`, t => {
+	const date = new Date();
+
+	const input = `[/foo/, "123", function foo () {}, "${date}"]`;
+	const unmarshalled = marshaller.unmarshal(input);
+
+	t.true(
+		Array.isArray(unmarshalled) &&
+		unmarshalled[0] instanceof RegExp &&
+		typeof unmarshalled[1] === "string" &&
+		typeDetector.isFunction(unmarshalled[2]) &&
+		unmarshalled[3] instanceof Date
+	);
+});
+
+test(`'unmarshal()' -> Array. #3`, t => {
+	const original = [1, "1", true, "true", new Date(), Infinity, "Infinity", NaN, "NaN"];
+	const marshalled = marshaller.marshal(original);
+
+	const unmarshalled = marshaller.unmarshal(marshalled);
+
+	t.true(
+		Array.isArray(unmarshalled) &&
+		typeof unmarshalled[0] === "number" &&
+		typeof unmarshalled[1] === "string" &&
+		typeof unmarshalled[2] === "boolean" &&
+		typeof unmarshalled[3] === "string" &&
+		unmarshalled[4] instanceof Date &&
+		typeof unmarshalled[5] === "number" &&
+		typeof unmarshalled[6] === "string" &&
+		typeof unmarshalled[7] === "number" &&
+		typeof unmarshalled[8] === "string"
+	);
+});
+
+test(`'unmarshal()' -> Array #4`, t => {
+
+	const input = `[
+		{
+			a: [1, "1", true, "${new Date()}"],
+			b: "${new Date()}"
+		}
+	]`;
+	const unmarshalled = <any> marshaller.unmarshal(input);
+
+	t.true(
+		Array.isArray(unmarshalled) &&
+		typeDetector.isObject(unmarshalled[0])
+	);
+});
+
+test(`'unmarshal()' -> boolean. #1`, t => {
 	const expected = true;
 	const input = `true`;
 
-	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, Boolean), expected);
+	t.deepEqual(marshaller.unmarshal(input), expected);
 });
 
-test(`'marshal()' string -> boolean. #2`, t => {
-	const expected = true;
-	const input = `true`;
-
-	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, Boolean), expected);
-});
-
-test(`'marshal()' string -> boolean. #3`, t => {
+test(`'unmarshal()' -> boolean. #2`, t => {
 	const expected = false;
 	const input = `false`;
 
-	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, Boolean), expected);
+	t.deepEqual(marshaller.unmarshal(input), expected);
 });
 
-test(`'marshal()' string -> boolean. #4`, t => {
-	const expected = true;
-	const input = `1`;
-
-	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, Boolean), expected);
-});
-
-test(`'marshal()' string -> boolean. #5`, t => {
-	const expected = false;
-	const input = `0`;
-
-	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, Boolean), expected);
-});
-
-test(`'marshal()' string -> number. #1`, t => {
+test(`'unmarshal()' -> number. #1`, t => {
 	const expected = 0;
 	const input = `0`;
 
-	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, Number), expected);
+	t.deepEqual(marshaller.unmarshal(input), expected);
 });
 
-test(`'marshal()' string -> number. #2`, t => {
+test(`'unmarshal() -> number. #2`, t => {
 	const expected = 1;
 	const input = `1`;
 
-	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, Number), expected);
+	t.deepEqual(marshaller.unmarshal(input), expected);
 });
 
-test(`'marshal()' string -> number. #3`, t => {
+test(`'unmarshal()' -> number. #3`, t => {
 	const expected = Infinity;
 	const input = `Infinity`;
 
-	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, Number), expected);
+	t.deepEqual(marshaller.unmarshal(input), expected);
 });
 
-test(`'marshal()' string -> function. #1`, t => {
+test(`'unmarshal()' -> function #1`, t => {
 	const expected = function () {
 	};
 	const input = `function () {}`;
 
-	const marshalled = marshaller.marshal(input, expected);
+	const marshalled = <Function>marshaller.unmarshal(input);
 	t.true(typeof marshalled === "function" && expected.toString() === marshalled.toString());
 });
 
-test(`'marshal()' string -> best guess. #1`, t => {
-	const expected = "1";
-	const input = `"1"`;
-
-	t.deepEqual<Object|null|undefined>(marshaller.marshal(input), expected);
-});
-
-test(`'marshal()' string -> best guess. #2`, t => {
-	const input = `{"foobar": \`baz\`}`;
-
-	t.true(typeDetector.isObject(marshaller.marshal(input)));
-});
-
-test(`'marshal()' string -> best guess. #3`, t => {
+test(`'unmarshal()' -> function #2`, t => {
 	const input = `() => {}`;
 	const expected = () => {
 	};
 
-	const marshalled = marshaller.marshal(input);
+	const marshalled = marshaller.unmarshal(input);
 	if (marshalled == null) t.fail();
 	else t.deepEqual(marshalled.toString(), expected.toString());
 });
 
-test(`'marshal()' string -> best guess. #4`, t => {
+test(`'unmarshal()' -> function #3`, t => {
 	const input = `function () {}`;
 	const expected = function () {
 	};
 
-	const marshalled = marshaller.marshal(input);
+	const marshalled = marshaller.unmarshal(input);
 	if (marshalled == null) t.fail();
 	else t.deepEqual(marshalled.toString(), expected.toString());
 });
 
-test(`'marshal()' string -> best guess. #5`, t => {
+test(`'unmarshal()' -> string #1`, t => {
+	const expected = "1";
+	const input = `"1"`;
+
+	t.deepEqual(marshaller.unmarshal(input), expected);
+});
+
+test(`'unmarshal()' -> string #2`, t => {
 	const input = `hellofunction () {}`;
 	const expected = input;
 
-	const marshalled = marshaller.marshal(input);
+	const marshalled = marshaller.unmarshal(input);
 	if (marshalled == null) t.fail();
 	else t.deepEqual(marshalled.toString(), expected.toString());
 });
 
-test(`'marshal()' string -> best guess. #6`, t => {
+test(`'unmarshal()' -> string #3`, t => {
 	const input = `hello() => {}`;
 	const expected = input;
 
-	const marshalled = marshaller.marshal(input);
+	const marshalled = marshaller.unmarshal(input);
 	if (marshalled == null) t.fail();
 	else t.deepEqual(marshalled.toString(), expected.toString());
 });
 
-test(`'marshal()' string -> best guess. #7`, t => {
-	const input = `{"hmm": ((arg) => { return (arg === undefined ? undefined : arg)+10;})}`;
-
-	const marshalled = marshaller.marshal(input);
-	t.true(typeDetector.isObject(marshalled));
-});
-
-test(`'marshal()' string -> best guess. #8`, t => {
-	const input = `{"global": ${GlobalObjectIdentifier}}`;
-
-	const marshalled = marshaller.marshal(input);
-	t.true(typeDetector.isObject(marshalled));
-});
-
-test(`'marshal()' string -> best guess. #9`, t => {
+test(`'unmarshal()' -> Date #1`, t => {
 	const date = new Date();
 	const input = date.toISOString();
 
-	const marshalled = marshaller.marshal(input);
-	t.true(marshalled instanceof Date);
+	const marshalled = marshaller.unmarshal(input);
+	t.true(marshalled != null && marshalled instanceof Date);
 });
 
-test(`'marshal()' string -> best guess. #10`, t => {
+test(`'unmarshal()' -> Date #2`, t => {
 	const date = new Date();
 	const input = date.toUTCString();
 
-	const marshalled = marshaller.marshal(input);
-	t.true(marshalled instanceof Date);
+	const marshalled = marshaller.unmarshal(input);
+	t.true(marshalled != null && marshalled instanceof Date);
 });
 
-test(`'marshal()' object -> string. #1`, t => {
+test(`'unmarshal()' -> Date #3`, t => {
+	const expected = new Date();
+
+	const marshalled = <Date>marshaller.unmarshal(expected.toISOString());
+	t.deepEqual(marshalled.getTime(), expected.getTime());
+});
+
+test(`'unmarshal()' -> Date #4`, t => {
+	const expected = new Date();
+
+	const marshalled = marshaller.unmarshal(expected.toString());
+	t.true(marshalled != null && marshalled instanceof Date);
+});
+
+test(`'unmarshal()' -> class #1`, t => {
+
+	const input = `new (class A {
+        constructor() {
+            this.foo = 2;
+            if (this.foo) {}
+        }
+    
+static get __INSTANCE__VALUES_MAP () {return {"foo": 2}}
+})()`;
+
+	const result = <{foo: number}>marshaller.unmarshal(input);
+	t.true(result != null && result.constructor != null && result.constructor.name === "A" && result.foo === 2);
+});
+
+test(`'unmarshal()' -> class #2`, t => {
+
+	class Foo {
+		public foo: number = 2;
+	}
+
+	// Create a new instance and mutate the instance value of 'foo'
+	const instance = new Foo();
+	instance.foo = 3;
+
+	// Marshal it
+	const stringified = marshaller.marshal(instance);
+
+	// Unmarshal it
+	const marshalled = <{foo: number}> marshaller.unmarshal(stringified);
+
+	// Assert that 'foo' is still 3, even though it is initialized to another value as per the class definition.
+	t.true(marshalled != null && marshalled.constructor != null && marshalled.constructor.name === "Foo" && marshalled.foo === 3);
+});
+
+test(`'marshal()' <- object #1`, t => {
 	const expected = "{\"a\": 2}";
 	const input = {
 		a: 2
 	};
 
-	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, expected), expected);
+	t.deepEqual(marshaller.marshal(input), expected);
 });
 
-test(`'marshal()' object -> string. #2`, t => {
+test(`'marshal()' <- object #2`, t => {
 	const expected = "{\"a\": 2, \"b\": () => {}}";
 	const input = {
 		a: 2,
@@ -218,10 +303,10 @@ test(`'marshal()' object -> string. #2`, t => {
 		}
 	};
 
-	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, expected), expected);
+	t.deepEqual(marshaller.marshal(input), expected);
 });
 
-test(`'marshal()' object -> string. #3`, t => {
+test(`'marshal()' <- object. #3`, t => {
 	const expected = "{\"c\": {\"d\": `hello sir!`}}";
 	const input = {
 		c: {
@@ -229,10 +314,10 @@ test(`'marshal()' object -> string. #3`, t => {
 		}
 	};
 
-	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, expected), expected);
+	t.deepEqual(marshaller.marshal(input), expected);
 });
 
-test(`'marshal()' object -> string. #4`, t => {
+test(`'marshal()' <- object #4`, t => {
 	const expected = "{\"foo\": false, \"type\": {\"expression\": `hello`}}";
 	const foo = false;
 	const exp = "hello";
@@ -243,19 +328,19 @@ test(`'marshal()' object -> string. #4`, t => {
 		}
 	};
 
-	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, expected), expected);
+	t.deepEqual(marshaller.marshal(input), expected);
 });
 
-test(`'marshal()' object -> string. #5`, t => {
+test(`'marshal()' <- object #5`, t => {
 	const expected = "{\"foo\": false}";
 	const input = {
 		"foo": false
 	};
 
-	t.deepEqual<Object|null|undefined>(marshaller.marshal(input, expected), expected);
+	t.deepEqual(marshaller.marshal(input), expected);
 });
 
-test(`'marshal()' object -> string. #6`, t => {
+test(`'marshal()' <- object #6`, t => {
 	const expected = "{\"foo\": class Foo {}}";
 
 	class Foo {
@@ -265,52 +350,42 @@ test(`'marshal()' object -> string. #6`, t => {
 		"foo": Foo
 	};
 
-	const marshalled = marshaller.marshal(input, expected);
+	const marshalled = marshaller.marshal(input);
 	t.deepEqual(marshalled, expected);
 });
 
-test(`'marshal()' object -> string. #7`, t => {
+test(`'marshal()' <- object #7`, t => {
 	const expected = `{"global": ${GlobalObjectIdentifier}}`;
 	const input = {
 		"global": GlobalObject
 	};
 
-	const marshalled = marshaller.marshal(input, expected);
+	const marshalled = marshaller.marshal(input);
 	t.deepEqual(marshalled, expected);
 });
 
-test(`'marshal()' string -> object. #1`, t => {
-	const expected = {
-		foo: false,
-		type: {
-			expression: "hello"
-		}
-	};
-
-	const input = "{\"foo\": false, \"type\": {\"expression\": `hello`}}";
-
-	t.deepEqual(marshaller.marshal(input, expected), expected);
-});
-
-test(`'marshal()' class -> string. #1`, t => {
+test(`'marshal()' <- class #1`, t => {
 	class A {
 		get foo () {
 			return true;
 		}
 	}
 
+	const input = new A();
+
 	const expected = `new (class A {
         get foo() {
             return true;
         }
-    })()`;
-	const input = new A();
+    
+static get __INSTANCE__VALUES_MAP () {return {}}
+})()`;
 
-	const result = <string>marshaller.marshal(input, expected);
+	const result = <string>marshaller.marshal(input);
 	t.deepEqual(result, expected);
 });
 
-test(`'marshal()' class -> string. #2`, t => {
+test(`'marshal()' <- class #2`, t => {
 	class A {
 		constructor (_1: any, _2: any) {
 		}
@@ -324,6 +399,8 @@ test(`'marshal()' class -> string. #2`, t => {
 		}
 	}
 
+	const input = new A(1, 2);
+
 	const expected = `new (class A {
         constructor(_1, _2) {}
         static get foo() {
@@ -332,22 +409,90 @@ test(`'marshal()' class -> string. #2`, t => {
         static bar() {
             return false;
         }
-    })()`;
-	const input = new A(1, 2);
-	const result = <string>marshaller.marshal(input, expected);
+    
+static get __INSTANCE__VALUES_MAP () {return {}}
+})()`;
+
+	const result = <string>marshaller.marshal(input);
 	t.deepEqual(result, expected);
 });
 
-test(`'marshal()' Date -> string. #1`, t => {
-	const date = new Date();
-	const expected = date.toISOString();
+test(`'marshal()' <- class #3`, t => {
+	class A {
+		private foo: number = 2;
+		constructor () {
+			if (this.foo) {}
+		}
+	}
 
-	t.deepEqual(marshaller.marshal(date, expected), expected);
+	const input = new A();
+
+	const expected = `new (class A {
+        constructor() {
+            this.foo = 2;
+            if (this.foo) {}
+        }
+    
+static get __INSTANCE__VALUES_MAP () {return {"foo": 2}}
+})()`;
+
+	const result = <string>marshaller.marshal(input);
+	t.deepEqual(result, expected);
 });
 
-test(`'marshal()' string -> Date. #1`, t => {
-	const expected = new Date();
+test(`'marshal()' <- Date #1`, t => {
+	const date = new Date();
+	const expected = `new Date("${date.toISOString()}")`;
 
-	const marshalled = <Date>marshaller.marshal(expected.toISOString(), Date);
-	t.deepEqual(marshalled.getTime(), expected.getTime());
+	t.deepEqual(marshaller.marshal(date), expected);
+});
+
+test(`'unmarshal() + marshal()' #1`, t => {
+	const set = new Set<number>([]);
+	set.add(1);
+	set.add(2);
+	set.add(3);
+
+	const native = {
+		a: new Date(),
+		b: [1, "2", new Date()],
+		c: {
+			d: set
+		}
+	};
+
+	const marshalled = marshaller.marshal(native);
+	const unmarshalled = <any>marshaller.unmarshal(marshalled);
+	t.true(
+		typeDetector.isObject(unmarshalled) &&
+		unmarshalled.a instanceof Date &&
+		Array.isArray(unmarshalled.b) &&
+		typeof (<any>unmarshalled).b[0] === "number" &&
+		typeof (<any>unmarshalled).b[1] === "string" &&
+		(<any>unmarshalled).b[2] instanceof Date &&
+		typeDetector.isObject(unmarshalled.c)
+	);
+});
+
+test(`'unmarshal() + marshal()' #2`, t => {
+	class A {
+		public foo: number = 2;
+		constructor () {
+			if (this.foo) {}
+		}
+	}
+
+	const instance = new A();
+	instance.foo = 3;
+
+	const native = {
+		a: instance
+	};
+
+	const marshalled = marshaller.marshal(native);
+	const unmarshalled = <any>marshaller.unmarshal(marshalled);
+	t.true(
+		typeDetector.isObject(unmarshalled) &&
+		(<A>unmarshalled.a).foo === 3
+	);
 });
