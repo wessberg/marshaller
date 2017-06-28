@@ -1,4 +1,4 @@
-import {ITypeDetector} from "@wessberg/typedetector";
+import {ITypeDetector, TypeDetector} from "@wessberg/typedetector";
 import {IMarshaller} from "./interface/IMarshaller";
 import {GlobalObject, GlobalObjectIdentifier} from "@wessberg/globalobject";
 
@@ -25,7 +25,7 @@ export class Marshaller implements IMarshaller {
 	private static readonly DEFAULT_DATE_STRING_REGEX: RegExp = /\w{3} \w{3} \d{2} \d{4} \d{2}:\d{2}:\d{2} GMT(\+\d+)? \(\w{1,9}\)/;
 	private static readonly REGEX_REGEX: RegExp = /^\/(.*)\/(\w*)$/;
 
-	constructor (private typeDetector: ITypeDetector) {
+	constructor (private typeDetector: ITypeDetector = new TypeDetector()) {
 	}
 
 	/**
@@ -555,7 +555,7 @@ export class Marshaller implements IMarshaller {
 
 	private handleComputedItem (data: {}|null|undefined|string): {}|null|undefined|string {
 		if (this.shouldUnmarshalComputedItem(data)) return this.unmarshal(data);
-		if (this.typeDetector.isClassInstance(data)) return this.reconstructClassInstance(data);
+		if (data != null && this.typeDetector.isClassInstance(data)) return this.reconstructClassInstance(data);
 		return data;
 	}
 

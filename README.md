@@ -144,6 +144,10 @@ The (*) means that the types cannot be restored to their initial state since the
 
 ## Changelog:
 
+**v2.0.1**:
+
+- Bumped TypeDetector dependency. Allowed construction without explicitly calling the constructor with TypeDetector so it can be used by clients who does not directly depend on it.
+
 **v2.0.0**:
 
 - Major overhaul. Where the Marshaller could previously map between any types, the Marshaller now has a sharp focus on being able to marshal any data to a string representation and be able to unmarshal the data back into the native representation in a non-destructive operation (e.g. all data should be re-retrievable).
