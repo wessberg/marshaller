@@ -144,6 +144,10 @@ The (*) means that the types cannot be restored to their initial state since the
 
 ## Changelog:
 
+**v2.0.2**:
+
+- Fixed an issue where strings containing dates would be falsely unmarshalled as dates instead of regular strings.
+
 **v2.0.1**:
 
 - Bumped TypeDetector dependency. Allowed construction without explicitly calling the constructor with TypeDetector so it can be used by clients who does not directly depend on it.

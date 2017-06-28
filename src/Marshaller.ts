@@ -20,9 +20,9 @@ export class Marshaller implements IMarshaller {
 	private static readonly FUNCTION_REGEX_1: RegExp = /^\(*function\s*\w*\s*\([^)]*\)\s*{/;
 	private static readonly FUNCTION_REGEX_2: RegExp = /^\(+[^)]*\)\s*=>/;
 	private static readonly FUNCTION_REGEX_3: RegExp = /^\w+\s*=>/;
-	private static readonly ISO_STRING_REGEX: RegExp = /(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))/;
-	private static readonly UTC_STRING_REGEX: RegExp = /(\w{3}), (\d{2}) (\w{3}) (\d{4}) ((\d{2}):(\d{2}):(\d{2})) GMT/;
-	private static readonly DEFAULT_DATE_STRING_REGEX: RegExp = /\w{3} \w{3} \d{2} \d{4} \d{2}:\d{2}:\d{2} GMT(\+\d+)? \(\w{1,9}\)/;
+	private static readonly ISO_STRING_REGEX: RegExp = /(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))$|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))$|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))$/;
+	private static readonly UTC_STRING_REGEX: RegExp = /(\w{3}), (\d{2}) (\w{3}) (\d{4}) ((\d{2}):(\d{2}):(\d{2})) GMT$/;
+	private static readonly DEFAULT_DATE_STRING_REGEX: RegExp = /\w{3} \w{3} \d{2} \d{4} \d{2}:\d{2}:\d{2} GMT(\+\d+)? \(\w{1,9}\)$/;
 	private static readonly REGEX_REGEX: RegExp = /^\/(.*)\/(\w*)$/;
 
 	constructor (private typeDetector: ITypeDetector = new TypeDetector()) {

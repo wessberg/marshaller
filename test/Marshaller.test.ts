@@ -221,6 +221,15 @@ test(`'unmarshal()' -> string #3`, t => {
 	else t.deepEqual(marshalled.toString(), expected.toString());
 });
 
+test(`'unmarshal()' -> string #4`, t => {
+	const input = `2017-06-28T12:23:00.893Z-0`;
+	const expected = input;
+
+	const marshalled = marshaller.unmarshal(input);
+	if (marshalled == null) t.fail();
+	else t.deepEqual(marshalled.toString(), expected.toString());
+});
+
 test(`'unmarshal()' -> Date #1`, t => {
 	const date = new Date();
 	const input = date.toISOString();
