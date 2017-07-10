@@ -7,6 +7,13 @@
   "browser": "./dist/es2015/index.js",
   "types": "./dist/es2015/index.d.ts",
   "typings": "./dist/es2015/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wessberg/Marshaller.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wessberg/Marshaller/issues"
+  },
   "scripts": {
     "build:pre": "mkdir -p dist/cjs/interface && mkdir -p dist/es2015/interface",
     "build:cjs": "tsc --module commonjs --outDir dist/cjs -p tsconfig.dist.json",
