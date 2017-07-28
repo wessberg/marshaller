@@ -1,5 +1,5 @@
 import {ITypeDetector, TypeDetector} from "@wessberg/typedetector";
-import {IMarshaller} from "./interface/IMarshaller";
+import {Arbitrary, IMarshaller} from "./interface/IMarshaller";
 import {GlobalObject, GlobalObjectIdentifier} from "@wessberg/globalobject";
 
 /**
@@ -24,6 +24,7 @@ export class Marshaller implements IMarshaller {
 	private static readonly UTC_STRING_REGEX: RegExp = /(\w{3}), (\d{2}) (\w{3}) (\d{4}) ((\d{2}):(\d{2}):(\d{2})) GMT$/;
 	private static readonly DEFAULT_DATE_STRING_REGEX: RegExp = /\w{3} \w{3} \d{2} \d{4} \d{2}:\d{2}:\d{2} GMT(\+\d+)? \(\w{1,9}\)$/;
 	private static readonly REGEX_REGEX: RegExp = /^\/(.*)\/(\w*)$/;
+	private static readonly ACCEPTED_REGEX_FLAGS: Set<string> = new Set(["g", "m", "i", "x", "X", "s", "u", "U", "A", "J", "D"]);
 
 	constructor (private typeDetector: ITypeDetector = new TypeDetector()) {
 	}
@@ -110,7 +111,22 @@ export class Marshaller implements IMarshaller {
 	}
 
 	private stringIsRegExp (str: string): boolean {
-		return Marshaller.REGEX_REGEX.test(str);
+		const matchesRegex = Marshaller.REGEX_REGEX.test(str);
+		if (!matchesRegex) return false;
+
+		// The string may test true for the RegExp but still not be a regular expression. For example, the string: '/foo/bar' is not a regular expression, it is just
+		// a REST endpoint.
+		const indexOfLastSlash = str.lastIndexOf("/");
+		const flags = indexOfLastSlash === -1 ? null : str.slice(indexOfLastSlash + 1);
+
+		// If no flags are given, it sure looks like a regular expression (like '/foo/'). Return true.
+		if (flags == null) return true;
+
+		// Otherwise we, can use the "flags" to determine if they are flags or really just an endpoint.
+		const allFlags = flags.split("");
+
+		// If any of the characters are not supported as regular expression flags, return false, otherwise return true.
+		return !allFlags.some(flag => !Marshaller.ACCEPTED_REGEX_FLAGS.has(flag));
 	}
 
 	private stringIsBoolean (str: string): boolean {
@@ -171,11 +187,11 @@ export class Marshaller implements IMarshaller {
 	private marshalClass (data: {}): string {
 		// Take all instance values out of the class and make sure that they
 		// can be reconstructed when the class is reassembled.
-		const keyMap: { [key: string]: any } = {};
+		const keyMap: { [key: string]: Arbitrary } = {};
 		const keys = Object.getOwnPropertyNames(data);
-		keys.forEach(key => keyMap[key] = (<{ [key: string]: any }>data)[key]);
+		keys.forEach(key => keyMap[key] = (<{ [key: string]: Arbitrary }>data)[key]);
 
-		const stringified = <string>this.marshal(data.constructor);
+		const stringified = this.marshal(data.constructor);
 		const toLast = stringified.slice(0, stringified.length - 1);
 		const fromLast = stringified.slice(stringified.length - 1);
 		const normalized = `${toLast}\nstatic get ${Marshaller.CLASS_INSTANCE_INSTANCE_VALUES_MAP_NAME} () {return ${this.marshalObject(keyMap)}}\n${fromLast}`;
@@ -184,14 +200,14 @@ export class Marshaller implements IMarshaller {
 	}
 
 	private reconstructClassInstance (data: {}): {} {
-		const keyMap = (<any>data.constructor)[Marshaller.CLASS_INSTANCE_INSTANCE_VALUES_MAP_NAME];
+		const keyMap = (<Arbitrary>data.constructor)[Marshaller.CLASS_INSTANCE_INSTANCE_VALUES_MAP_NAME];
 
 		if (keyMap != null) {
 			// Remove the property from the constructor (we won't need it anymore)
-			delete (<any>data.constructor)[Marshaller.CLASS_INSTANCE_INSTANCE_VALUES_MAP_NAME];
+			delete (<Arbitrary>data.constructor)[Marshaller.CLASS_INSTANCE_INSTANCE_VALUES_MAP_NAME];
 
 			// Set the instance values on the new instance.
-			Object.keys(keyMap).forEach(key => (<any>data)[key] = keyMap[key]);
+			Object.keys(keyMap).forEach(key => (<Arbitrary>data)[key] = keyMap[key]);
 		}
 
 		return data;
@@ -242,9 +258,8 @@ export class Marshaller implements IMarshaller {
 	private unmarshalDate (data: string|String): Date {
 		const primitive = data instanceof String ? data.valueOf() : data;
 
-
 		if (Marshaller.MARSHALLED_DATE_REGEX.test(primitive)) {
-			return new Function (`return ${primitive}`)();
+			return new Function(`return ${primitive}`)();
 		}
 
 		if (Marshaller.ISO_STRING_REGEX.test(primitive)) {
@@ -335,10 +350,12 @@ export class Marshaller implements IMarshaller {
 	private unmarshalConstructor (data: string|String): Function {
 		const primitive = data instanceof String ? data.valueOf() : data;
 		if (!primitive.trim().startsWith("class")) {
+			/*tslint:disable*/
 			class Class {
+				/*tslint:enable*/
 			}
 
-			(<any>Class)[<any>data] = data;
+			(<Arbitrary>Class)[<Arbitrary>data] = data;
 			return Class;
 		}
 		return new Function(`return (${data})`)();
@@ -460,8 +477,8 @@ export class Marshaller implements IMarshaller {
 			const marshalled = typeof value === "string" ? value : this.marshal(value);
 			const isFunction = this.typeDetector.isFunction(value);
 
-			if (isFunction) str += this.formatObjectLiteralFunction(<string>marshalled);
-			else if (isString) str += this.quoteIfNecessary(<string>marshalled);
+			if (isFunction) str += this.formatObjectLiteralFunction(marshalled);
+			else if (isString) str += this.quoteIfNecessary(marshalled);
 			else str += marshalled;
 			if (index !== keys.length - 1) str += `,${space}`;
 		});
@@ -474,10 +491,10 @@ export class Marshaller implements IMarshaller {
 	 * @param {string|String} data
 	 * @returns {object}
 	 */
-	private unmarshalObject (data: string|String): { [key: string]: any } {
+	private unmarshalObject (data: string|String): { [key: string]: Arbitrary } {
 		const primitive = data instanceof String ? data.valueOf() : data;
 
-		const parsed = <{ [key: string]: any }> new Function(`return (${primitive})`)();
+		const parsed = <{ [key: string]: Arbitrary }> new Function(`return (${primitive})`)();
 		const keys = Object.keys(parsed);
 
 		keys.forEach(key => {

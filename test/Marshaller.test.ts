@@ -3,6 +3,7 @@ import {Marshaller} from "../src/Marshaller";
 import {TypeDetector} from "@wessberg/typedetector";
 import {GlobalObject, GlobalObjectIdentifier} from "@wessberg/globalobject";
 
+/*tslint:disable*/
 const typeDetector = new TypeDetector();
 const marshaller = new Marshaller(typeDetector);
 
@@ -167,6 +168,14 @@ test(`'unmarshal()' -> number. #3`, t => {
 	t.deepEqual(marshaller.unmarshal(input), expected);
 });
 
+test(`'unmarshal()' -> RegExp #1`, t => {
+	const expected = /abc/;
+	const input = `/abc/`;
+
+	const unmarshalled = <RegExp>marshaller.unmarshal(input);
+	t.true(unmarshalled instanceof RegExp && unmarshalled.toString() === expected.toString());
+});
+
 test(`'unmarshal()' -> function #1`, t => {
 	const expected = function () {
 	};
@@ -227,6 +236,15 @@ test(`'unmarshal()' -> string #4`, t => {
 
 	const marshalled = marshaller.unmarshal(input);
 	if (marshalled == null) t.fail();
+	else t.deepEqual(marshalled.toString(), expected.toString());
+});
+
+test(`'unmarshal()' -> string #5`, t => {
+	const input = `/foo/bar`;
+	const expected = input;
+
+	const marshalled = marshaller.unmarshal(input);
+	if (marshalled == null || marshalled instanceof RegExp) t.fail();
 	else t.deepEqual(marshalled.toString(), expected.toString());
 });
 
@@ -383,10 +401,10 @@ test(`'marshal()' <- class #1`, t => {
 	const input = new A();
 
 	const expected = `new (class A {
-        get foo() {
-            return true;
-        }
-    
+            get foo() {
+                return true;
+            }
+        
 static get __INSTANCE__VALUES_MAP () {return {}}
 })()`;
 
@@ -411,14 +429,14 @@ test(`'marshal()' <- class #2`, t => {
 	const input = new A(1, 2);
 
 	const expected = `new (class A {
-        constructor(_1, _2) {}
-        static get foo() {
-            return true;
-        }
-        static bar() {
-            return false;
-        }
-    
+            constructor(_1, _2) {}
+            static get foo() {
+                return true;
+            }
+            static bar() {
+                return false;
+            }
+        
 static get __INSTANCE__VALUES_MAP () {return {}}
 })()`;
 
@@ -437,11 +455,11 @@ test(`'marshal()' <- class #3`, t => {
 	const input = new A();
 
 	const expected = `new (class A {
-        constructor() {
-            this.foo = 2;
-            if (this.foo) {}
-        }
-    
+            constructor() {
+                this.foo = 2;
+                if (this.foo) {}
+            }
+        
 static get __INSTANCE__VALUES_MAP () {return {"foo": 2}}
 })()`;
 
@@ -505,3 +523,4 @@ test(`'unmarshal() + marshal()' #2`, t => {
 		(<A>unmarshalled.a).foo === 3
 	);
 });
+/*tslint:enable*/
