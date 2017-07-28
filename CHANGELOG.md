@@ -1,7 +1,11 @@
 <a name="2.0.3"></a>
 ## 2.0.3 (2017-07-28)
 
+* Added changelog ([e1c2253](https://github.com/wessberg/marshaller/commit/e1c2253))
+* Bumped version ([f6bc236](https://github.com/wessberg/marshaller/commit/f6bc236))
 * Fixed an issue where regular expressions would be matched falsely at times ([11be80e](https://github.com/wessberg/marshaller/commit/11be80e))
+* Update .gitignore ([8fd18c2](https://github.com/wessberg/marshaller/commit/8fd18c2))
+* Update package.json ([b1c9b2f](https://github.com/wessberg/marshaller/commit/b1c9b2f))
 
 
 
