@@ -1,19 +1,4 @@
-# Marshaller [![NPM version][npm-image]][npm-url]
-[![Dev Dependencies][dev-dependencies-image]][dev-dependencies-url]
-
-[dev-dependencies-url]: https://david-dm.org/wessberg/typedetector?type=dev
-
-[dev-dependencies-image]: https://david-dm.org/hub.com/wessberg/marshaller/dev-status.svg
-[![deps][deps-image]][deps-url]
-
-[deps-url]: https://david-dm.org/wessberg/typedetector
-
-[deps-image]: https://david-dm.org/hub.com/wessberg/marshaller/status.svg
-[![License-mit][license-mit-image]][license-mit-url]
-
-[license-mit-url]: https://opensource.org/licenses/MIT
-
-[license-mit-image]: https://img.shields.io/badge/License-MIT-yellow.svg
+# Marshaller
 > A class that can map various data types back and forth between a string representation that can be transferred over the wire or evaluated using eval() or new Function() expressions and back to the native environment. This is equivalent to `JSON.parse()` and `JSON.stringify()` except with a much broader scope.
 
 ## Installation

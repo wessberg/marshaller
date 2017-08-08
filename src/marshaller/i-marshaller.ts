@@ -5,5 +5,5 @@ export declare type Newable<U> = NewableGeneric<U>|StringConstructor|NumberConst
 
 export interface IMarshaller {
 	marshal<T> (data: T): string;
-	unmarshal<T> (data: string): T|{}|null|undefined;
+	unmarshal<T> (data: string, unquote?: boolean): T|{}|null|undefined;
 }

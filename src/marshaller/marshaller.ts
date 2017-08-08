@@ -1,6 +1,6 @@
 import {ITypeDetector, TypeDetector} from "@wessberg/typedetector";
-import {Arbitrary, IMarshaller} from "./interface/IMarshaller";
-import {GlobalObject, GlobalObjectIdentifier} from "@wessberg/globalobject";
+import {Arbitrary, IMarshaller} from "./i-marshaller";
+import {globalObject, globalObjectIdentifier} from "@wessberg/globalobject";
 
 /**
  * A class that can map various data types back and forth between a string representation that can be transferred over the wire
@@ -8,22 +8,107 @@ import {GlobalObject, GlobalObjectIdentifier} from "@wessberg/globalobject";
  * @author Frederik Wessberg
  */
 export class Marshaller implements IMarshaller {
+	/**
+	 * The name for the map of instance values used when marshalling classes so that mutated instance values
+	 * can be reconstructed later on when unmarshalling it.
+	 * @type {string}
+	 */
 	public static readonly CLASS_INSTANCE_INSTANCE_VALUES_MAP_NAME: string = "__INSTANCE__VALUES_MAP";
+
+	/**
+	 * A Regular Expression for matching symbols
+	 * @type {RegExp}
+	 */
 	private static readonly SYMBOL_REGEX: RegExp = /Symbol\(([^)]*)\)/;
+
+	/**
+	 * A Regular Expression for matching class instances
+	 * @type {RegExp}
+	 */
 	private static readonly CLASS_INSTANCE_REGEX: RegExp = /\w+\s*{}/;
+
+	/**
+	 * A Regular Expression for matching marshalled class instances
+	 * @type {RegExp}
+	 */
 	private static readonly MARSHALLED_CLASS_INSTANCE_REGEX: RegExp = /new\s*\((\s*class\s+\w+)/;
+
+	/**
+	 * A Regular Expression for matching marshalled Maps
+	 * @type {RegExp}
+	 */
 	private static readonly MARSHALLED_MAP_REGEX: RegExp = /new\s+Map\(\[/;
+
+	/**
+	 * A Regular Expression for matching marshalled Sets
+	 * @type {RegExp}
+	 */
 	private static readonly MARSHALLED_SET_REGEX: RegExp = /new\s+Set\(\[/;
+
+	/**
+	 * A Regular Expression for matching marshalled WeakMaps
+	 * @type {RegExp}
+	 */
 	private static readonly MARSHALLED_WEAK_MAP_REGEX: RegExp = /new\s+WeakMap\(\[/;
+
+	/**
+	 * A Regular Expression for matching marshalled WeakSets
+	 * @type {RegExp}
+	 */
 	private static readonly MARSHALLED_WEAK_SET_REGEX: RegExp = /new\s+WeakSet\(\[/;
+
+	/**
+	 * A Regular Expression for matching marshalled dates
+	 * @type {RegExp}
+	 */
 	private static readonly MARSHALLED_DATE_REGEX: RegExp = /new\s+Date\(/;
+
+	/**
+	 * A Regular Expression for matching functions.
+	 * @type {RegExp}
+	 */
 	private static readonly FUNCTION_REGEX_1: RegExp = /^\(*function\s*\w*\s*\([^)]*\)\s*{/;
+
+	/**
+	 * A Regular Expression for matching functions.
+	 * @type {RegExp}
+	 */
 	private static readonly FUNCTION_REGEX_2: RegExp = /^\(+[^)]*\)\s*=>/;
+
+	/**
+	 * A Regular Expression for matching functions.
+	 * @type {RegExp}
+	 */
 	private static readonly FUNCTION_REGEX_3: RegExp = /^\w+\s*=>/;
+
+	/**
+	 * A Regular Expression for matching ISO strings.
+	 * @type {RegExp}
+	 */
 	private static readonly ISO_STRING_REGEX: RegExp = /(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))$|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))$|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))$/;
+
+	/**
+	 * A Regular Expression for matching UTC/GMT strings.
+	 * @type {RegExp}
+	 */
 	private static readonly UTC_STRING_REGEX: RegExp = /(\w{3}), (\d{2}) (\w{3}) (\d{4}) ((\d{2}):(\d{2}):(\d{2})) GMT$/;
+
+	/**
+	 * A Regular Expression for matching dates.
+	 * @type {RegExp}
+	 */
 	private static readonly DEFAULT_DATE_STRING_REGEX: RegExp = /\w{3} \w{3} \d{2} \d{4} \d{2}:\d{2}:\d{2} GMT(\+\d+)? \(\w{1,9}\)$/;
+
+	/**
+	 * A Regular Expression for matching Regular Expressions.
+	 * @type {RegExp}
+	 */
 	private static readonly REGEX_REGEX: RegExp = /^\/(.*)\/(\w*)$/;
+
+	/**
+	 * A Set of all flags that Regular Expressions accepts.
+	 * @type {RegExp}
+	 */
 	private static readonly ACCEPTED_REGEX_FLAGS: Set<string> = new Set(["g", "m", "i", "x", "X", "s", "u", "U", "A", "J", "D"]);
 
 	constructor (private typeDetector: ITypeDetector = new TypeDetector()) {
@@ -35,7 +120,7 @@ export class Marshaller implements IMarshaller {
 	 * @returns {string}
 	 */
 	public marshal<T> (data: T): string {
-		if (<{}>data === GlobalObject) return GlobalObjectIdentifier;
+		if (<{}>data === globalObject) return globalObjectIdentifier;
 		if (data === undefined) return this.marshalUndefined(data);
 		if (data === null) return this.marshalNull(data);
 		if (this.typeDetector.isString(data)) return (<String>data instanceof String ? `"${<string>data.valueOf()}"` : `"${data}"`);
@@ -58,10 +143,12 @@ export class Marshaller implements IMarshaller {
 
 	/**
 	 * Unmarshals marshalled data back into a type that is native to the environment.
+	 * If 'unquote' is true, strings will be unquoted if they are wrapped in quotes.
 	 * @param {string|String} data
+	 * @param {boolean} [unquote=true]
 	 * @returns {T|{}|null|?}
 	 */
-	public unmarshal<T> (data: string|String): T|{}|null|undefined {
+	public unmarshal<T> (data: string|String, unquote: boolean = true): T|{}|null|undefined {
 		if (data === undefined) return undefined;
 		if (data === null) return null;
 
@@ -85,9 +172,14 @@ export class Marshaller implements IMarshaller {
 		if (this.stringIsFunction(primitive)) return this.unmarshalFunction(primitive);
 
 		// Fall back to the primitive value itself.
-		return this.unquoteIfNecessary(primitive);
+		return unquote ? this.unquoteIfNecessary(primitive) : primitive;
 	}
 
+	/**
+	 * Returns true if the given string is in fact a (potentially marshalled) date.
+	 * @param {string} str
+	 * @returns {boolean}
+	 */
 	private stringIsDate (str: string): boolean {
 		return Marshaller.ISO_STRING_REGEX.test(str) ||
 			Marshaller.UTC_STRING_REGEX.test(str) ||
@@ -95,6 +187,11 @@ export class Marshaller implements IMarshaller {
 			Marshaller.MARSHALLED_DATE_REGEX.test(str);
 	}
 
+	/**
+	 * Returns true if the given string is in fact a (potentially marshalled) function.
+	 * @param {string} str
+	 * @returns {boolean}
+	 */
 	private stringIsFunction (str: string): boolean {
 		const trimmed = str.trim();
 		return Marshaller.FUNCTION_REGEX_1.test(trimmed) ||
@@ -102,6 +199,11 @@ export class Marshaller implements IMarshaller {
 			Marshaller.FUNCTION_REGEX_3.test(trimmed);
 	}
 
+	/**
+	 * Returns true if the given string is in fact a (potentially marshalled) number.
+	 * @param {string} str
+	 * @returns {boolean}
+	 */
 	private stringIsNumber (str: string): boolean {
 		if (str === "Infinity") return true;
 		if (str === "NaN") return true;
@@ -110,6 +212,11 @@ export class Marshaller implements IMarshaller {
 		return !isNaN(toNum) && !this.startsWithNumberButShouldEnforceString(str);
 	}
 
+	/**
+	 * Returns true if the given string is in fact a (potentially marshalled) regular expression.
+	 * @param {string} str
+	 * @returns {boolean}
+	 */
 	private stringIsRegExp (str: string): boolean {
 		const matchesRegex = Marshaller.REGEX_REGEX.test(str);
 		if (!matchesRegex) return false;
@@ -129,51 +236,111 @@ export class Marshaller implements IMarshaller {
 		return !allFlags.some(flag => !Marshaller.ACCEPTED_REGEX_FLAGS.has(flag));
 	}
 
+	/**
+	 * Returns true if the given string is in fact a (potentially marshalled) boolean.
+	 * @param {string} str
+	 * @returns {boolean}
+	 */
 	private stringIsBoolean (str: string): boolean {
 		return str === "true" || str === "false";
 	}
 
+	/**
+	 * Returns true if the given string is in fact a (potentially marshalled) undefined value.
+	 * @param {string} str
+	 * @returns {boolean}
+	 */
 	private stringIsUndefined (str: string): boolean {
 		return str === "undefined";
 	}
 
+	/**
+	 * Returns true if the given string is in fact a (potentially marshalled) null value.
+	 * @param {string} str
+	 * @returns {boolean}
+	 */
 	private stringIsNull (str: string): boolean {
 		return str === "null";
 	}
 
+	/**
+	 * Returns true if the given string is in fact a (potentially marshalled) Map.
+	 * @param {string} str
+	 * @returns {boolean}
+	 */
 	private stringIsMap (str: string): boolean {
 		return Marshaller.MARSHALLED_MAP_REGEX.test(str.trim());
 	}
 
+	/**
+	 * Returns true if the given string is in fact a (potentially marshalled) Set.
+	 * @param {string} str
+	 * @returns {boolean}
+	 */
 	private stringIsSet (str: string): boolean {
 		return Marshaller.MARSHALLED_SET_REGEX.test(str.trim());
 	}
 
+	/**
+	 * Returns true if the given string is in fact a (potentially marshalled) WeakMap.
+	 * @param {string} str
+	 * @returns {boolean}
+	 */
 	private stringIsWeakMap (str: string): boolean {
 		return Marshaller.MARSHALLED_WEAK_MAP_REGEX.test(str.trim());
 	}
 
+	/**
+	 * Returns true if the given string is in fact a (potentially marshalled) WeakSet.
+	 * @param {string} str
+	 * @returns {boolean}
+	 */
 	private stringIsWeakSet (str: string): boolean {
 		return Marshaller.MARSHALLED_WEAK_SET_REGEX.test(str.trim());
 	}
 
+	/**
+	 * Returns true if the given string is in fact a (potentially marshalled) class instance.
+	 * @param {string} str
+	 * @returns {boolean}
+	 */
 	private stringIsClass (str: string): boolean {
 		return Marshaller.CLASS_INSTANCE_REGEX.test(str) || Marshaller.MARSHALLED_CLASS_INSTANCE_REGEX.test(str);
 	}
 
+	/**
+	 * Returns true if the given string is in fact a (potentially marshalled) class constructor.
+	 * @param {string} str
+	 * @returns {boolean}
+	 */
 	private stringIsConstructor (str: string): boolean {
 		return str.trim().startsWith("class ");
 	}
 
+	/**
+	 * Returns true if the given string is in fact a (potentially marshalled) symbol.
+	 * @param {string} str
+	 * @returns {boolean}
+	 */
 	private stringIsSymbol (str: string): boolean {
 		return Marshaller.SYMBOL_REGEX.test(str);
 	}
 
+	/**
+	 * Returns true if the given string is in fact a (potentially marshalled) object.
+	 * @param {string} str
+	 * @returns {boolean}
+	 */
 	private stringIsObject (str: string): boolean {
 		const trimmed = str.trim();
 		return trimmed.startsWith("{") && trimmed.endsWith("}");
 	}
 
+	/**
+	 * Returns true if the given string is in fact a (potentially marshalled) array.
+	 * @param {string} str
+	 * @returns {boolean}
+	 */
 	private stringIsArray (str: string): boolean {
 		const trimmed = str.trim();
 		return trimmed.startsWith("[") && trimmed.endsWith("]");
@@ -199,6 +366,12 @@ export class Marshaller implements IMarshaller {
 		return `new (${normalized})()`;
 	}
 
+	/**
+	 * "Reconstructs" a class instance from the provided data. This means that it will instantiate a new class instance
+	 * and mutate its properties so it has the same state as before it was marshalled.
+	 * @param {{}} data
+	 * @returns {{}}
+	 */
 	private reconstructClassInstance (data: {}): {} {
 		const keyMap = (<Arbitrary>data.constructor)[Marshaller.CLASS_INSTANCE_INSTANCE_VALUES_MAP_NAME];
 
@@ -570,12 +743,22 @@ export class Marshaller implements IMarshaller {
 		return parsed.map(item => this.handleComputedItem(item));
 	}
 
+	/**
+	 * Unmarshals the given data if required or generates a class with re-instantiated instance values and returns it.
+	 * @param {{} | string} data
+	 * @returns {{} | string}
+	 */
 	private handleComputedItem (data: {}|null|undefined|string): {}|null|undefined|string {
 		if (this.shouldUnmarshalComputedItem(data)) return this.unmarshal(data);
 		if (data != null && this.typeDetector.isClassInstance(data)) return this.reconstructClassInstance(data);
 		return data;
 	}
 
+	/**
+	 * Returns true if the data should be unmarshalled
+	 * @param {{} | string} data
+	 * @returns {boolean}
+	 */
 	private shouldUnmarshalComputedItem (data: {}|null|undefined|string): data is string {
 		if (typeof data !== "string") return false;
 		return !(this.stringIsNumber(data) || this.stringIsBoolean(data) || this.stringIsUndefined(data) || this.stringIsNull(data));
@@ -622,6 +805,11 @@ export class Marshaller implements IMarshaller {
 		return /["'`]/.test(content);
 	}
 
+	/**
+	 * Unquotes the given string if required.
+	 * @param {string} content
+	 * @returns {string}
+	 */
 	private unquoteIfNecessary (content: string): string {
 		if (!(typeof content === "string")) return content;
 		const firstIndex = 0;

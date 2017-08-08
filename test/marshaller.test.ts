@@ -1,7 +1,7 @@
 import test from "ava";
-import {Marshaller} from "../src/Marshaller";
+import {Marshaller} from "../src/marshaller/marshaller";
 import {TypeDetector} from "@wessberg/typedetector";
-import {GlobalObject, GlobalObjectIdentifier} from "@wessberg/globalobject";
+import {globalObject, globalObjectIdentifier} from "@wessberg/globalobject";
 
 /*tslint:disable*/
 const typeDetector = new TypeDetector();
@@ -54,7 +54,7 @@ test(`'unmarshal()' -> object #4`, t => {
 });
 
 test(`'unmarshal()' -> object #5`, t => {
-	const input = `{"global": ${GlobalObjectIdentifier}}`;
+	const input = `{"global": ${globalObjectIdentifier}}`;
 
 	const marshalled = marshaller.unmarshal(input);
 	t.true(typeDetector.isObject(marshalled));
@@ -382,9 +382,9 @@ test(`'marshal()' <- object #6`, t => {
 });
 
 test(`'marshal()' <- object #7`, t => {
-	const expected = `{"global": ${GlobalObjectIdentifier}}`;
+	const expected = `{"global": ${globalObjectIdentifier}}`;
 	const input = {
-		"global": GlobalObject
+		"global": globalObject
 	};
 
 	const marshalled = marshaller.marshal(input);

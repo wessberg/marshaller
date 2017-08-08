@@ -1,6 +1,6 @@
 {
 	"name": "@wessberg/marshaller",
-	"version": "2.0.3",
+	"version": "2.0.4",
 	"description": "A class that maps between a variety of data types.",
 	"scripts": {
 		"changelog:generate": "conventional-changelog --outfile CHANGELOG.md --release-count 0",
@@ -37,17 +37,17 @@
 		"type casting"
 	],
 	"devDependencies": {
-		"@wessberg/ts-config": "0.0.20",
-		"ava": "^0.19.1",
-		"typescript": "^2.4.1",
-		"tslint": "latest",
+		"@wessberg/ts-config": "0.0.21",
+		"ava": "^0.21.0",
+		"conventional-changelog-cli": "latest",
 		"husky": "latest",
-		"conventional-changelog-cli": "latest"
+		"tslint": "^5.6.0",
+		"typescript": "^2.4.2"
 	},
 	"dependencies": {
-		"@wessberg/globalobject": "^1.0.5",
+		"@wessberg/globalobject": "^1.0.7",
 		"@wessberg/typedetector": "^1.0.6",
-		"tslib": "latest"
+		"tslib": "^1.7.1"
 	},
 	"main": "./dist/umd/index.js",
 	"module": "./dist/es2015/index.js",

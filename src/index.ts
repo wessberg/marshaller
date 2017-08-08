@@ -1,3 +1,3 @@
 export {TypeOf} from "@wessberg/typedetector";
-export {IMarshaller} from "./interface/IMarshaller";
-export {Marshaller} from "./Marshaller";
+export {IMarshaller} from "./marshaller/i-marshaller";
+export {Marshaller} from "./marshaller/marshaller";
