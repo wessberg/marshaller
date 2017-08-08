@@ -1,7 +1,10 @@
-<a name="2.0.3"></a>
-## 2.0.3 (2017-07-28)
+<a name="2.0.5"></a>
+## 2.0.5 (2017-08-08)
 
+* 2.0.5 ([1dab82b](https://github.com/wessberg/marshaller/commit/1dab82b))
+* Added an 'unquote' second argument to 'unmarshal'. Documentation ([509801d](https://github.com/wessberg/marshaller/commit/509801d))
 * Added changelog ([e1c2253](https://github.com/wessberg/marshaller/commit/e1c2253))
+* Bumped version ([79a5e41](https://github.com/wessberg/marshaller/commit/79a5e41))
 * Bumped version ([f6bc236](https://github.com/wessberg/marshaller/commit/f6bc236))
 * Fixed an issue where regular expressions would be matched falsely at times ([11be80e](https://github.com/wessberg/marshaller/commit/11be80e))
 * Update .gitignore ([8fd18c2](https://github.com/wessberg/marshaller/commit/8fd18c2))
