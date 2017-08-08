@@ -1,6 +1,6 @@
 {
 	"name": "@wessberg/marshaller",
-	"version": "2.0.4",
+	"version": "2.0.5",
 	"description": "A class that maps between a variety of data types.",
 	"scripts": {
 		"changelog:generate": "conventional-changelog --outfile CHANGELOG.md --release-count 0",
