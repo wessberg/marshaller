@@ -1,6 +1,6 @@
 {
 	"name": "@wessberg/marshaller",
-	"version": "2.0.5",
+	"version": "3.0.0",
 	"description": "A lightweight way to serialize and deserialize complex data types non-destructively",
 	"scripts": {
 		"changelog:generate": "conventional-changelog --outfile CHANGELOG.md --release-count 0",
