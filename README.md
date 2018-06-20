@@ -2,6 +2,8 @@
 [![NPM version][npm-version-image]][npm-version-url]
 [![License-mit][license-mit-image]][license-mit-url]
 
+<a href="https://www.patreon.com/bePatron?u=11315442"><img height="30" src="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png" /></a>
+
 [license-mit-url]: https://opensource.org/licenses/MIT
 
 [license-mit-image]: https://img.shields.io/badge/License-MIT-yellow.svg
@@ -57,3 +59,7 @@ const demarshallResult = demarshall(marshallResult);
 ## Security
 
 Due to security considerations, you *cannot* marshall/demarshall functions and/or methods.
+
+## Backers
+
+[Become a backer](https://www.patreon.com/bePatron?c=1770586) and get your name, logo, and link to your site listed here. Your help is greatly appreciated!
