@@ -1,3 +1,11 @@
+## <small>3.0.2 (2018-06-20)</small>
+
+* 3.0.2 ([a6caf5f](https://github.com/wessberg/marshaller/commit/a6caf5f))
+* Added Patreon banner ([090b683](https://github.com/wessberg/marshaller/commit/090b683))
+* Bumped version ([0374fb4](https://github.com/wessberg/marshaller/commit/0374fb4))
+
+
+
 ## <small>3.0.1 (2018-06-20)</small>
 
 * 3.0.1 ([dd90163](https://github.com/wessberg/marshaller/commit/dd90163))
