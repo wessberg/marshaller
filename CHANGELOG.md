@@ -1,3 +1,10 @@
+## <small>3.0.1 (2018-06-20)</small>
+
+* 3.0.1 ([dd90163](https://github.com/wessberg/marshaller/commit/dd90163))
+* Updated package.json ([47b2de6](https://github.com/wessberg/marshaller/commit/47b2de6))
+
+
+
 ## 3.0.0 (2018-06-20)
 
 * 3.0.0 ([329c981](https://github.com/wessberg/marshaller/commit/329c981))
