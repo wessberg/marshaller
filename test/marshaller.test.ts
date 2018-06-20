@@ -1,6 +1,8 @@
 import test from "ava";
 import {demarshall, marshall} from "../src/marshaller/marshaller";
 
+// tslint:disable:no-any
+
 test("#1", t => {
 	const original = undefined;
 	const marshalled = marshall(original);
@@ -62,4 +64,21 @@ test("#7", t => {
 	const marshalled = marshall(original);
 	const demarshalled = demarshall(marshalled);
 	t.deepEqual(original, demarshalled);
+});
+
+test("#8", t => {
+	const parent: any = {prop1: "value"};
+	parent.child = {prop2: "value", parent};
+	const marshalled = marshall(parent);
+	const demarshalled = demarshall(marshalled);
+	t.deepEqual(parent, demarshalled);
+});
+
+test.only("#9", t => {
+	const arr: any[] = [1, 2, 3];
+	// Push the arr itself to the array (circular dependency)
+	arr.push(arr);
+	const marshalled = marshall(arr);
+	const demarshalled = demarshall(marshalled);
+	t.deepEqual(arr, demarshalled);
 });
