@@ -1,3 +1,13 @@
+## <small>3.0.3 (2018-06-20)</small>
+
+* 3.0.3 ([07b6795](https://github.com/wessberg/marshaller/commit/07b6795))
+* Added a 'space' argument to the marshall function ([4acdb28](https://github.com/wessberg/marshaller/commit/4acdb28))
+* Added a purposefully failing test ([f081690](https://github.com/wessberg/marshaller/commit/f081690))
+* Added better detection for circular dependencies ([5e1cb1e](https://github.com/wessberg/marshaller/commit/5e1cb1e))
+* Bumped version ([3dd381a](https://github.com/wessberg/marshaller/commit/3dd381a))
+
+
+
 ## <small>3.0.2 (2018-06-20)</small>
 
 * 3.0.2 ([a6caf5f](https://github.com/wessberg/marshaller/commit/a6caf5f))
