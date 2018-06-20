@@ -22,12 +22,13 @@ declare const BigInt: Function;
 /**
  * Marshalls the given value
  * @param {T} value
+ * @param {string|number} [space]
  * @returns {string}
  */
-export function marshall<T> (value: T): string {
+export function marshall<T> (value: T, space?: string|number): string {
 	// Dates require special care since they - for whatever reason - is flattened to ISO strings before being passed on to the replacer hook
 	if (value instanceof Date) {
-		return JSON.stringify(JSON.stringify(marshallValue(value, new Map())));
+		return JSON.stringify(marshallValue(value, new Map()), undefined, space);
 	}
 	return JSON.stringify(value, marshallReplacer);
 }
@@ -38,11 +39,8 @@ export function marshall<T> (value: T): string {
  * @param {T} value
  * @returns {string?}
  */
-function marshallReplacer<T> (_key: string, value: T): string | undefined {
-	const marshalled = marshallValue(value, new Map());
-	if (marshalled == null) return undefined;
-	if (typeof marshalled === "string") return marshalled;
-	return JSON.stringify(marshalled);
+function marshallReplacer<T> (_key: string, value: T): MarshalledDataResult | undefined {
+	return marshallValue(value, new Map());
 }
 
 /**
@@ -127,7 +125,7 @@ function marshallValue<T> (value: T, refToRefIdentifierMap: Map<{}, string>): Ma
 
 			else if (Array.isArray(value)) {
 				// @ts-ignore
-				return value.map(marshallValue);
+				return value.map(v => marshallValue(v, refToRefIdentifierMap));
 			}
 
 			else if (typeofValue === "object" && value.constructor.name === "Object") {
@@ -168,23 +166,14 @@ function marshallValue<T> (value: T, refToRefIdentifierMap: Map<{}, string>): Ma
  * @returns {T}
  */
 export function demarshall<T> (value: string): T {
-	return JSON.parse(value, demarshallReplacer);
-}
-
-/**
- * The replacer function for the demarshalling call
- * @param {string} _key
- * @param {T} value
- * @returns {string|?}
- */
-function demarshallReplacer<T> (_key: string, value: string): T {
-	const parsed: MarshalledDataResult =  JSON.parse(value);
+	const parsed: MarshalledDataResult = JSON.parse(value);
 	return demarshallValue(parsed, new Map());
 }
 
 /**
  * The replacer function for the demarshalling call
  * @param {MarshalledDataResult} data
+ * @param {Map<string, {}>} refMap
  * @returns {*}
  */
 function demarshallValue (data: MarshalledDataResult | MarshalledDataResult[] | [MarshalledDataResult, MarshalledDataResult][], refMap: Map<string, {}>): any {
