@@ -1,3 +1,4 @@
-export {TypeOf} from "@wessberg/typedetector";
-export {IMarshaller} from "./marshaller/i-marshaller";
-export {Marshaller} from "./marshaller/marshaller";
+export * from "./marshaller/marshaller";
+export * from "./marshaller/marshall-data-type";
+export * from "./marshaller/marshalled-data-keys";
+export * from "./marshaller/marshalled-data";
