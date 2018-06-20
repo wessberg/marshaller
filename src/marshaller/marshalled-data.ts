@@ -1,9 +1,9 @@
 import {MarshallDataType} from "./marshall-data-type";
-import {marshalledDataTypeKey} from "./marshalled-data-keys";
+import {marshalledDataTypeKey, marshalledRefKey} from "./marshalled-data-keys";
 
 export declare type JsonType = string|number|boolean;
 export declare type Data = JsonType|MarshalledData;
-export declare type MarshalledDataResult = Data[]|MarshalledData[]|Data|MarshalledData;
+export declare type MarshalledDataResult = Data|{[key: string]: MarshalledDataResult};
 
 // tslint:disable:no-any
 
@@ -31,14 +31,28 @@ export interface IMarshalledRegExpData extends IMarshalledData {
 	value: string;
 }
 
+export interface IMarshalledArrayData extends IMarshalledData {
+	[marshalledDataTypeKey]: "array";
+	[marshalledRefKey]: string;
+	value: MarshalledDataResult[];
+}
+
+export interface IMarshalledObjectData extends IMarshalledData {
+	[marshalledDataTypeKey]: "object";
+	[marshalledRefKey]: string;
+	value: {[key: string]: MarshalledDataResult};
+}
+
 export interface IMarshalledSetData extends IMarshalledData {
 	[marshalledDataTypeKey]: "set";
-	value: MarshalledDataResult[];
+	[marshalledRefKey]: string;
+	value: IMarshalledArrayData;
 }
 
 export interface IMarshalledMapData extends IMarshalledData {
 	[marshalledDataTypeKey]: "map";
-	value: [MarshalledDataResult, MarshalledDataResult][];
+	[marshalledRefKey]: string;
+	value: IMarshalledArrayData;
 }
 
 export interface IMarshalledUndefinedData extends IMarshalledData {
@@ -85,18 +99,19 @@ export interface IMarshalledFloat32ArrayData extends IMarshalledData {
 	value: number[];
 }
 
-export interface IMarshalledRefData extends IMarshalledData {
-	[marshalledDataTypeKey]: "ref";
-	value: string;
-}
-
 export interface IMarshalledFloat64ArrayData extends IMarshalledData {
 	[marshalledDataTypeKey]: "float64array";
 	value: number[];
+}
+
+export interface IMarshalledRefData extends IMarshalledData {
+	[marshalledDataTypeKey]: "ref";
+	value: string;
 }
 
 export interface IMarshalledNullData extends IMarshalledData {
 	[marshalledDataTypeKey]: "null";
 }
 
-export declare type MarshalledData = IMarshalledSymbolData|IMarshalledBigIntData|IMarshalledDateData|IMarshalledRegExpData|IMarshalledSetData|IMarshalledMapData|IMarshalledUndefinedData|IMarshalledNullData|IMarshalledUint8ArrayData|IMarshalledUint8ArrayData|IMarshalledUint8ClampedArrayData|IMarshalledUint16ArrayData|IMarshalledUint32ArrayData|IMarshalledInt8ArrayData|IMarshalledInt16ArrayData|IMarshalledInt32ArrayData|IMarshalledFloat32ArrayData|IMarshalledFloat64ArrayData|IMarshalledRefData;
+export declare type TypedArrayData = IMarshalledUint8ArrayData|IMarshalledUint8ClampedArrayData|IMarshalledUint16ArrayData|IMarshalledUint32ArrayData|IMarshalledInt8ArrayData|IMarshalledInt16ArrayData|IMarshalledInt32ArrayData|IMarshalledFloat32ArrayData|IMarshalledFloat64ArrayData;
+export declare type MarshalledData = TypedArrayData|IMarshalledSymbolData|IMarshalledBigIntData|IMarshalledDateData|IMarshalledRegExpData|IMarshalledSetData|IMarshalledMapData|IMarshalledUndefinedData|IMarshalledNullData|IMarshalledRefData|IMarshalledArrayData|IMarshalledObjectData;

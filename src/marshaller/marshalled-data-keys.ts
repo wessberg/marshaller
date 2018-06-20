@@ -1,2 +1,2 @@
-export const marshalledDataTypeKey = "___5301850019";
-export const marshalledRefKey = "___4714277760";
+export const marshalledDataTypeKey = "type";
+export const marshalledRefKey = "ref";

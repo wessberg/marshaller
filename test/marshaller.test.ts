@@ -69,15 +69,34 @@ test("#7", t => {
 test("#8", t => {
 	const parent: any = {prop1: "value"};
 	parent.child = {prop2: "value", parent};
+	parent.child.child = {prop3: "value", parent: parent.child};
 	const marshalled = marshall(parent);
 	const demarshalled = demarshall(marshalled);
 	t.deepEqual(parent, demarshalled);
 });
 
-test.only("#9", t => {
+test("#9", t => {
 	const arr: any[] = [1, 2, 3];
 	// Push the arr itself to the array (circular dependency)
 	arr.push(arr);
+	const marshalled = marshall(arr);
+	const demarshalled = demarshall(marshalled);
+	t.deepEqual(arr, demarshalled);
+});
+
+test("#9", t => {
+	const set: any = new Set([1, 2, 3]);
+	// Push the Set itself to the Set (circular dependency)
+	set.add(set);
+	const marshalled = marshall(set);
+	const demarshalled = demarshall(marshalled);
+	t.deepEqual(set, demarshalled);
+});
+
+test("#10", t => {
+	const arr: any = new Uint8Array([1, 2, 3]);
+	// Push the Set itself to the Set (circular dependency)
+	arr[4] = arr;
 	const marshalled = marshall(arr);
 	const demarshalled = demarshall(marshalled);
 	t.deepEqual(arr, demarshalled);

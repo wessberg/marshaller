@@ -1,1 +1,1 @@
-export declare type MarshallDataType = "undefined"|"null"|"date"|"regexp"|"symbol"|"bigint"|"set"|"map"|"int8array"|"int16array"|"int32array"|"uint8array"|"uint8clampedarray"|"uint16array"|"uint32array"|"float32array"|"float64array"|"ref";
+export declare type MarshallDataType = "undefined"|"null"|"date"|"regexp"|"symbol"|"bigint"|"set"|"map"|"int8array"|"int16array"|"int32array"|"uint8array"|"uint8clampedarray"|"uint16array"|"uint32array"|"float32array"|"float64array"|"ref"|"array"|"object";

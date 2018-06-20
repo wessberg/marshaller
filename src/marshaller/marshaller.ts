@@ -1,8 +1,9 @@
 import {MarshallDataType} from "./marshall-data-type";
-import {Data, IMarshalledBigIntData, IMarshalledData, IMarshalledDateData, IMarshalledFloat32ArrayData, IMarshalledFloat64ArrayData, IMarshalledInt16ArrayData, IMarshalledInt32ArrayData, IMarshalledInt8ArrayData, IMarshalledMapData, IMarshalledRefData, IMarshalledRegExpData, IMarshalledSetData, IMarshalledSymbolData, IMarshalledUint16ArrayData, IMarshalledUint32ArrayData, IMarshalledUint8ArrayData, IMarshalledUint8ClampedArrayData, JsonType, MarshalledDataResult} from "./marshalled-data";
+import {Data, IMarshalledArrayData, IMarshalledBigIntData, IMarshalledDateData, IMarshalledMapData, IMarshalledObjectData, IMarshalledRefData, IMarshalledRegExpData, IMarshalledSetData, IMarshalledSymbolData, JsonType, MarshalledData, MarshalledDataResult, TypedArrayData} from "./marshalled-data";
 import {marshalledDataTypeKey, marshalledRefKey} from "./marshalled-data-keys";
 
 // tslint:disable:no-any
+// tslint:disable:no-shadowed-variable
 
 /**
  * A Regular expression that matches the description of a Symbol
@@ -25,22 +26,8 @@ declare const BigInt: Function;
  * @param {string|number} [space]
  * @returns {string}
  */
-export function marshall<T> (value: T, space?: string|number): string {
-	// Dates require special care since they - for whatever reason - is flattened to ISO strings before being passed on to the replacer hook
-	if (value instanceof Date) {
-		return JSON.stringify(marshallValue(value, new Map()), undefined, space);
-	}
-	return JSON.stringify(value, marshallReplacer);
-}
-
-/**
- * The replacer function for the marshalling call
- * @param {string} _key
- * @param {T} value
- * @returns {string?}
- */
-function marshallReplacer<T> (_key: string, value: T): MarshalledDataResult | undefined {
-	return marshallValue(value, new Map());
+export function marshall<T> (value: T, space?: string | number): string {
+	return JSON.stringify(visitValue(value, new Map()), undefined, space);
 }
 
 /**
@@ -49,20 +36,31 @@ function marshallReplacer<T> (_key: string, value: T): MarshalledDataResult | un
  * @param {Map<{}, string>} refToRefIdentifierMap
  * @returns {Data}
  */
-function marshallValue<T> (value: T, refToRefIdentifierMap: Map<{}, string>): MarshalledDataResult {
+function visitValue<T> (value: T, refToRefIdentifierMap: Map<{}, string>): MarshalledDataResult {
 	const typeofValue = typeof value;
 
+	// Check for ref hits
+	const refMapHit = refToRefIdentifierMap.get(value);
+	if (refMapHit != null) {
+		return {[marshalledDataTypeKey]: "ref", value: refMapHit};
+	}
+
+	// Otherwise, if it is a simple JSON serialize type, just return the value
 	if (isJsonType(value)) {
 		return value;
 	}
 
-	switch (typeofValue) {
+	// Generate a ref for the value and store it in the Map
+	const generatedRef = generateRef();
+	refToRefIdentifierMap.set(value, generatedRef);
 
-		case "undefined":
-			return {[marshalledDataTypeKey]: "undefined"};
+	switch (typeofValue) {
 
 		case "function":
 			throw new TypeError(`Cannot marshal functions since this is considered to be a security risk!`);
+
+		case "undefined":
+			return {[marshalledDataTypeKey]: "undefined"};
 
 		case <MarshallDataType> "bigint":
 			return {[marshalledDataTypeKey]: "bigint", value: value.toString()};
@@ -84,15 +82,27 @@ function marshallValue<T> (value: T, refToRefIdentifierMap: Map<{}, string>): Ma
 			}
 
 			else if (value instanceof Set) {
-				return {[marshalledDataTypeKey]: "set", value: [...value].map(v => marshallValue(v, refToRefIdentifierMap))};
+				return {
+					[marshalledDataTypeKey]: "set",
+					[marshalledRefKey]: generatedRef,
+					value: <IMarshalledArrayData> visitValue([...value], refToRefIdentifierMap)
+				};
 			}
 
 			else if (value instanceof Map) {
-				return {[marshalledDataTypeKey]: "map", value: <[MarshalledDataResult, MarshalledDataResult][]> [...value].map(v => marshallValue(v, refToRefIdentifierMap))};
+				return {
+					[marshalledDataTypeKey]: "map",
+					[marshalledRefKey]: generatedRef,
+					value: <IMarshalledArrayData> visitValue([...value], refToRefIdentifierMap)
+				};
 			}
 
 			else if (value instanceof Uint8Array) {
 				return {[marshalledDataTypeKey]: "uint8array", value: [...value]};
+			}
+
+			else if (value instanceof Uint8ClampedArray) {
+				return {[marshalledDataTypeKey]: "uint8clampedarray", value: [...value]};
 			}
 
 			else if (value instanceof Uint16Array) {
@@ -124,25 +134,19 @@ function marshallValue<T> (value: T, refToRefIdentifierMap: Map<{}, string>): Ma
 			}
 
 			else if (Array.isArray(value)) {
-				// @ts-ignore
-				return value.map(v => marshallValue(v, refToRefIdentifierMap));
+				return {
+					[marshalledDataTypeKey]: "array",
+					[marshalledRefKey]: generatedRef,
+					value: value.map(v => visitValue(v, refToRefIdentifierMap))
+				};
 			}
 
-			else if (typeofValue === "object" && value.constructor.name === "Object") {
-				const refMapHit = refToRefIdentifierMap.get(value);
-				if (refMapHit != null) {
-					return {[marshalledDataTypeKey]: "ref", value: refMapHit};
-				}
-
-				const newBase = {[marshalledRefKey]: generateRef()};
-				refToRefIdentifierMap.set(value, newBase[marshalledRefKey]);
-
-				return Object.assign(newBase, ...Object.entries(value).map(([key, objectValue]) => {
-
-					return {
-						[key]: marshallValue(objectValue, refToRefIdentifierMap)
-					};
-				}));
+			else if (isObjectLiteral(value)) {
+				return {
+					[marshalledDataTypeKey]: "object",
+					[marshalledRefKey]: generatedRef,
+					value: Object.assign({}, ...Object.entries(value).map(([key, objectValue]) => ({[key]: visitValue(objectValue, refToRefIdentifierMap)})))
+				};
 			}
 
 			else if (value instanceof WeakMap) {
@@ -176,87 +180,126 @@ export function demarshall<T> (value: string): T {
  * @param {Map<string, {}>} refMap
  * @returns {*}
  */
-function demarshallValue (data: MarshalledDataResult | MarshalledDataResult[] | [MarshalledDataResult, MarshalledDataResult][], refMap: Map<string, {}>): any {
+function demarshallValue (data: MarshalledDataResult, refMap: Map<string, {}>): any {
+
 	if (isJsonType(data)) {
 		return data;
+	}
+
+	// Check if there is a ref for the data and store it in the refMap if so
+	const refMatch: string | undefined = (<any>data)[marshalledRefKey];
+
+	if (isMarshalledData(data)) {
+
+		switch (data[marshalledDataTypeKey]) {
+
+			case "array": {
+				const {value} = <IMarshalledArrayData> data;
+				const newArray: any[] = [];
+				refMap.set(refMatch!, newArray);
+				for (let i = 0; i < value.length; i++) {
+					newArray[i] = demarshallValue(value[i], refMap);
+				}
+				return newArray;
+			}
+
+			case "object": {
+				const {value} = <IMarshalledObjectData> data;
+				refMap.set(refMatch!, value);
+				return demarshallValue(value, refMap);
+			}
+
+			case "symbol": {
+				const {value} = <IMarshalledSymbolData> data;
+				return Symbol(value);
+			}
+
+			case "ref": {
+				const {value} = <IMarshalledRefData> data;
+				const refMapHit = refMap.get(value);
+				if (refMapHit == null) throw new ReferenceError(`Internal Error: Could not resolve a reference for a circular dependency!`);
+				return refMapHit;
+			}
+
+			case "bigint": {
+				const {value} = <IMarshalledBigIntData> data;
+				return BigInt(value);
+			}
+
+			case "undefined":
+				return undefined;
+
+			case "null":
+				return null;
+
+			case "date": {
+				const {value} = <IMarshalledDateData> data;
+				return new Date(value);
+			}
+
+			case "uint8array":
+			case "uint8clampedarray":
+			case "uint16array":
+			case "uint32array":
+			case "int8array":
+			case "int16array":
+			case "int32array":
+			case "float32array":
+			case "float64array":
+				const {value} = <TypedArrayData> data;
+				const newArray = getTypedArray(data[marshalledDataTypeKey], value.map(v => demarshallValue(v, refMap)));
+				refMap.set(refMatch!, newArray);
+				return newArray;
+
+			case "regexp": {
+				const {value} = <IMarshalledRegExpData> data;
+				return new Function(`return ${value}`)();
+			}
+
+			case "set": {
+				const {value} = <IMarshalledSetData> data;
+				const newSet: Set<any> = new Set();
+				refMap.set(refMatch!, newSet);
+				value.value.forEach(v => newSet.add(demarshallValue(v, refMap)));
+				return newSet;
+			}
+
+			case "map": {
+				const {value} = <IMarshalledMapData> data;
+				const newMap: Map<any, any> = new Map();
+				refMap.set(refMatch!, newMap);
+				value.value.forEach(v => {
+					const [key, value] = demarshallValue(v, refMap);
+					newMap.set(key, value);
+				});
+				return newMap;
+			}
+
+			default:
+				throw new TypeError(`Could not demarshall a value: ${data}`);
+		}
 	}
 
 	else if (Array.isArray(data)) {
 		return (<Data[]>data).map(v => demarshallValue(v, refMap));
 	}
 
-	else if (!isMarshalledData(data)) {
-		const refMatch: string|undefined = (<any>data)[marshalledRefKey];
-		const newData = {};
-		if (refMatch != null) {
-			refMap.set(refMatch, newData);
-		}
-		return Object.assign(newData, ...Object.entries(data).map(([key, objectValue]) => key === marshalledRefKey ? {} : {[key]: demarshallValue(<MarshalledDataResult> objectValue, refMap)}));
+	else if (isObjectLiteral(data)) {
+		return Object.assign(data, ...Object.entries(data).map(([key, objectValue]) => key === marshalledDataTypeKey ? {} : {[key]: demarshallValue(<any> objectValue, refMap)}));
 	}
 
-	// Otherwise, it has to be some marshalled data
-
-	switch (data[marshalledDataTypeKey]) {
-
-		case "symbol":
-			return Symbol((<IMarshalledSymbolData> data).value);
-
-		case "ref":
-			const refMapHit = refMap.get((<IMarshalledRefData> data).value);
-			if (refMapHit == null) throw new ReferenceError(`Internal Error: Could not resolve a reference for a circular dependency!`);
-			return refMapHit;
-
-		case "bigint":
-			return BigInt((<IMarshalledBigIntData> data).value);
-
-		case "undefined":
-			return undefined;
-
-		case "null":
-			return null;
-
-		case "date":
-			return new Date((<IMarshalledDateData> data).value);
-
-		case "uint8array":
-			return new Uint8Array((<IMarshalledUint8ArrayData> data).value);
-
-		case "uint8clampedarray":
-			return new Uint8ClampedArray((<IMarshalledUint8ClampedArrayData> data).value);
-
-		case "uint16array":
-			return new Uint16Array((<IMarshalledUint16ArrayData> data).value);
-
-		case "uint32array":
-			return new Uint32Array((<IMarshalledUint32ArrayData> data).value);
-
-		case "int8array":
-			return new Int8Array((<IMarshalledInt8ArrayData> data).value);
-
-		case "int16array":
-			return new Int16Array((<IMarshalledInt16ArrayData> data).value);
-
-		case "int32array":
-			return new Int32Array((<IMarshalledInt32ArrayData> data).value);
-
-		case "float32array":
-			return new Float32Array((<IMarshalledFloat32ArrayData> data).value);
-
-		case "float64array":
-			return new Float64Array((<IMarshalledFloat64ArrayData> data).value);
-
-		case "regexp":
-			return new Function(`return ${(<IMarshalledRegExpData> data).value}`)();
-
-		case "set":
-			return new Set(demarshallValue((<IMarshalledSetData> data).value, refMap));
-
-		case "map":
-			return new Map(demarshallValue((<IMarshalledMapData> data).value, refMap));
-
-		default:
-			throw new TypeError(`Could not demarshall a value: ${data}`);
+	else {
+		throw new Error("Internal Error: This state may never happen");
 	}
+}
+
+/**
+ * Returns true if the given data represents an Object Literal
+ * @param {*} data
+ * @returns {boolean}
+ */
+function isObjectLiteral (data: any): data is object {
+	return typeof data === "object" && data.constructor.name === "Object";
 }
 
 /**
@@ -272,8 +315,9 @@ function isJsonType (data: any): data is JsonType {
  * Returns true if the given data is some marshalled data
  * @param {*} data
  */
-function isMarshalledData (data: any): data is IMarshalledData {
-	return !isJsonType(data) && !Array.isArray(data) && marshalledDataTypeKey in data;
+function isMarshalledData (data: any): data is MarshalledData {
+	const typeofData = <MarshallDataType> typeof data;
+	return data != null && !isJsonType(data) && !Array.isArray(data) && typeofData !== "symbol" && typeofData !== "bigint" && marshalledDataTypeKey in data;
 }
 
 /**
@@ -282,4 +326,34 @@ function isMarshalledData (data: any): data is IMarshalledData {
  */
 function generateRef (): string {
 	return (Math.random() * REF_QUANTIFIER).toFixed(0);
+}
+
+/**
+ * Gets a TypedArray that matches the given MarshalledDataType
+ * @param {MarshallDataType} type
+ * @param {number[]} args
+ */
+function getTypedArray (type: MarshallDataType, args: number[]): Uint8Array | Uint8ClampedArray | Uint16Array | Uint32Array | Int8Array | Int16Array | Int32Array | Float32Array | Float64Array {
+	switch (type) {
+		case "uint8array":
+			return new Uint8Array(args);
+		case "uint8clampedarray":
+			return new Uint8ClampedArray(args);
+		case "uint16array":
+			return new Uint16Array(args);
+		case "uint32array":
+			return new Uint32Array(args);
+		case "int8array":
+			return new Int8Array(args);
+		case "int16array":
+			return new Int16Array(args);
+		case "int32array":
+			return new Int32Array(args);
+		case "float32array":
+			return new Float32Array(args);
+		case "float64array":
+			return new Float64Array(args);
+		default:
+			throw new TypeError(`The given data type: ${type} can not be used with TypedArrays!`);
+	}
 }
