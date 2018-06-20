@@ -1,3 +1,10 @@
+## <small>3.0.4 (2018-06-20)</small>
+
+* 3.0.4 ([8c9ad09](https://github.com/wessberg/marshaller/commit/8c9ad09))
+* Bumped version ([540bcb9](https://github.com/wessberg/marshaller/commit/540bcb9))
+
+
+
 ## <small>3.0.3 (2018-06-20)</small>
 
 * 3.0.3 ([07b6795](https://github.com/wessberg/marshaller/commit/07b6795))
