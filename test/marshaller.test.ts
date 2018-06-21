@@ -2,6 +2,7 @@ import test from "ava";
 import {demarshall, marshall} from "../src/marshaller/marshaller";
 
 // tslint:disable:no-any
+// tslint:disable:no-construct
 
 test("#1", t => {
 	const original = undefined;
@@ -100,4 +101,53 @@ test("#10", t => {
 	const marshalled = marshall(arr);
 	const demarshalled = demarshall(marshalled);
 	t.deepEqual(arr, demarshalled);
+});
+
+test("#11", t => {
+	const original = NaN;
+	const marshalled = marshall(original);
+	const demarshalled = demarshall(marshalled);
+	t.deepEqual(original, demarshalled);
+});
+
+test("#12", t => {
+	const original = Infinity;
+	const marshalled = marshall(original);
+	const demarshalled = demarshall(marshalled);
+	t.deepEqual(original, demarshalled);
+});
+
+test("#13", t => {
+	const referenceObject = new Float32Array();
+	const original = {a: referenceObject, b: referenceObject};
+	const marshalled = marshall(original);
+	const demarshalled = demarshall(marshalled);
+	t.deepEqual(original, demarshalled);
+});
+
+test("#14", t => {
+	// noinspection JSPrimitiveTypeWrapperUsage
+	const referenceObject = new String("foo");
+	const original = {a: referenceObject, b: referenceObject};
+	const marshalled = marshall(original);
+	const demarshalled = demarshall(marshalled);
+	t.deepEqual(original, demarshalled);
+});
+
+test("#15", t => {
+	// noinspection JSPrimitiveTypeWrapperUsage
+	const referenceObject = new Number(2);
+	const original = {a: referenceObject, b: referenceObject};
+	const marshalled = marshall(original);
+	const demarshalled = demarshall(marshalled);
+	t.deepEqual(original, demarshalled);
+});
+
+test("#16", t => {
+	// noinspection JSPrimitiveTypeWrapperUsage
+	const referenceObject = new Boolean(true);
+	const original = {a: referenceObject, b: referenceObject};
+	const marshalled = marshall(original);
+	const demarshalled = demarshall(marshalled);
+	t.deepEqual(original, demarshalled);
 });

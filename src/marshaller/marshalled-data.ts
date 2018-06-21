@@ -18,7 +18,26 @@ export interface IMarshalledSymbolData extends IMarshalledData{
 
 export interface IMarshalledBigIntData extends IMarshalledData {
 	[marshalledDataTypeKey]: "bigint";
+	[marshalledRefKey]: string;
 	value: string;
+}
+
+export interface IMarshalledStringBoxedData extends IMarshalledData {
+	[marshalledDataTypeKey]: "string-boxed";
+	[marshalledRefKey]: string;
+	value: string;
+}
+
+export interface IMarshalledNumberBoxedData extends IMarshalledData {
+	[marshalledDataTypeKey]: "number-boxed";
+	[marshalledRefKey]: string;
+	value: number;
+}
+
+export interface IMarshalledBooleanBoxedData extends IMarshalledData {
+	[marshalledDataTypeKey]: "boolean-boxed";
+	[marshalledRefKey]: string;
+	value: boolean;
 }
 
 export interface IMarshalledDateData extends IMarshalledData {
@@ -109,6 +128,14 @@ export interface IMarshalledFloat32ArrayData extends IMarshalledData {
 	value: number[];
 }
 
+export interface IMarshalledNaNData extends IMarshalledData {
+	[marshalledDataTypeKey]: "nan";
+}
+
+export interface IMarshalledInfinityData extends IMarshalledData {
+	[marshalledDataTypeKey]: "infinity";
+}
+
 export interface IMarshalledFloat64ArrayData extends IMarshalledData {
 	[marshalledDataTypeKey]: "float64array";
 	[marshalledRefKey]: string;
@@ -125,4 +152,4 @@ export interface IMarshalledNullData extends IMarshalledData {
 }
 
 export declare type TypedArrayData = IMarshalledUint8ArrayData|IMarshalledUint8ClampedArrayData|IMarshalledUint16ArrayData|IMarshalledUint32ArrayData|IMarshalledInt8ArrayData|IMarshalledInt16ArrayData|IMarshalledInt32ArrayData|IMarshalledFloat32ArrayData|IMarshalledFloat64ArrayData;
-export declare type MarshalledData = TypedArrayData|IMarshalledSymbolData|IMarshalledBigIntData|IMarshalledDateData|IMarshalledRegExpData|IMarshalledSetData|IMarshalledMapData|IMarshalledUndefinedData|IMarshalledNullData|IMarshalledRefData|IMarshalledArrayData|IMarshalledObjectData;
+export declare type MarshalledData = TypedArrayData|IMarshalledSymbolData|IMarshalledBigIntData|IMarshalledDateData|IMarshalledRegExpData|IMarshalledSetData|IMarshalledMapData|IMarshalledUndefinedData|IMarshalledNullData|IMarshalledRefData|IMarshalledArrayData|IMarshalledObjectData|IMarshalledNaNData|IMarshalledInfinityData|IMarshalledStringBoxedData|IMarshalledNumberBoxedData|IMarshalledBooleanBoxedData;

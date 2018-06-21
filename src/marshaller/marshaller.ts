@@ -1,9 +1,10 @@
 import {MarshallDataType} from "./marshall-data-type";
-import {Data, IMarshalledArrayData, IMarshalledBigIntData, IMarshalledDateData, IMarshalledMapData, IMarshalledObjectData, IMarshalledRefData, IMarshalledRegExpData, IMarshalledSetData, IMarshalledSymbolData, JsonType, MarshalledData, MarshalledDataResult, TypedArrayData} from "./marshalled-data";
+import {Data, IMarshalledArrayData, IMarshalledBigIntData, IMarshalledBooleanBoxedData, IMarshalledDateData, IMarshalledMapData, IMarshalledNumberBoxedData, IMarshalledObjectData, IMarshalledRefData, IMarshalledRegExpData, IMarshalledSetData, IMarshalledStringBoxedData, IMarshalledSymbolData, JsonType, MarshalledData, MarshalledDataResult, TypedArrayData} from "./marshalled-data";
 import {marshalledDataTypeKey, marshalledRefKey} from "./marshalled-data-keys";
 
 // tslint:disable:no-any
 // tslint:disable:no-shadowed-variable
+// tslint:disable:no-construct
 
 /**
  * A Regular expression that matches the description of a Symbol
@@ -31,7 +32,6 @@ export function marshall<T> (value: T, space?: string | number): string {
  * @returns {Data}
  */
 function visitValue<T> (value: T, refToRefIdentifierMap: Map<{}, string>): MarshalledDataResult {
-	const typeofValue = typeof value;
 
 	// Check for ref hits
 	const refMapHit = refToRefIdentifierMap.get(value);
@@ -44,11 +44,7 @@ function visitValue<T> (value: T, refToRefIdentifierMap: Map<{}, string>): Marsh
 		return value;
 	}
 
-	// Generate a ref for the value and store it in the Map
-	const generatedRef = generateRef(refToRefIdentifierMap.size);
-	refToRefIdentifierMap.set(value, generatedRef);
-
-	switch (typeofValue) {
+	switch (typeof value) {
 
 		case "function":
 			throw new TypeError(`Cannot marshal functions since this is considered to be a security risk!`);
@@ -57,27 +53,49 @@ function visitValue<T> (value: T, refToRefIdentifierMap: Map<{}, string>): Marsh
 			return {[marshalledDataTypeKey]: "undefined"};
 
 		case <MarshallDataType> "bigint":
-			return {[marshalledDataTypeKey]: "bigint", value: value.toString()};
+			return {
+				[marshalledDataTypeKey]: "bigint",
+				[marshalledRefKey]: addRef(value, refToRefIdentifierMap),
+				value: value.toString()
+			};
 
 		case "symbol":
 			return {[marshalledDataTypeKey]: "symbol", value: (<symbol><any>value).toString().match(SYMBOL_REGEX)![1]};
 
 		default: {
+
 			if (value === null) {
 				return {[marshalledDataTypeKey]: "null"};
+			}
+
+			else if (typeof value === "number" && isNaN(value)) {
+				return {[marshalledDataTypeKey]: "nan"};
+			}
+
+			else if (typeof value === "number" && value === Infinity) {
+				return {[marshalledDataTypeKey]: "infinity"};
 			}
 
 			else if (value instanceof Date) {
 				return {
 					[marshalledDataTypeKey]: "date",
-					[marshalledRefKey]: generatedRef,
-					value: value.toISOString()};
+					[marshalledRefKey]: addRef(value, refToRefIdentifierMap),
+					value: value.toISOString()
+				};
+			}
+
+			else if (value instanceof String || value instanceof Number || value instanceof Boolean) {
+				return {
+					[marshalledDataTypeKey]: value instanceof String ? "string-boxed" : value instanceof Number ? "number-boxed" : "boolean-boxed",
+					[marshalledRefKey]: addRef(value, refToRefIdentifierMap),
+					value: value.valueOf()
+				};
 			}
 
 			else if (value instanceof RegExp) {
 				return {
 					[marshalledDataTypeKey]: "regexp",
-					[marshalledRefKey]: generatedRef,
+					[marshalledRefKey]: addRef(value, refToRefIdentifierMap),
 					value: value.toString()
 				};
 			}
@@ -85,7 +103,7 @@ function visitValue<T> (value: T, refToRefIdentifierMap: Map<{}, string>): Marsh
 			else if (value instanceof Set) {
 				return {
 					[marshalledDataTypeKey]: "set",
-					[marshalledRefKey]: generatedRef,
+					[marshalledRefKey]: addRef(value, refToRefIdentifierMap),
 					value: <IMarshalledArrayData> visitValue([...value], refToRefIdentifierMap)
 				};
 			}
@@ -93,51 +111,51 @@ function visitValue<T> (value: T, refToRefIdentifierMap: Map<{}, string>): Marsh
 			else if (value instanceof Map) {
 				return {
 					[marshalledDataTypeKey]: "map",
-					[marshalledRefKey]: generatedRef,
+					[marshalledRefKey]: addRef(value, refToRefIdentifierMap),
 					value: <IMarshalledArrayData> visitValue([...value], refToRefIdentifierMap)
 				};
 			}
 
 			else if (value instanceof Uint8Array) {
-				return {[marshalledDataTypeKey]: "uint8array", [marshalledRefKey]: generatedRef, value: [...value]};
+				return {[marshalledDataTypeKey]: "uint8array", [marshalledRefKey]: addRef(value, refToRefIdentifierMap), value: [...value]};
 			}
 
 			else if (value instanceof Uint8ClampedArray) {
-				return {[marshalledDataTypeKey]: "uint8clampedarray", [marshalledRefKey]: generatedRef, value: [...value]};
+				return {[marshalledDataTypeKey]: "uint8clampedarray", [marshalledRefKey]: addRef(value, refToRefIdentifierMap), value: [...value]};
 			}
 
 			else if (value instanceof Uint16Array) {
-				return {[marshalledDataTypeKey]: "uint16array", [marshalledRefKey]: generatedRef, value: [...value]};
+				return {[marshalledDataTypeKey]: "uint16array", [marshalledRefKey]: addRef(value, refToRefIdentifierMap), value: [...value]};
 			}
 
 			else if (value instanceof Uint32Array) {
-				return {[marshalledDataTypeKey]: "uint32array", [marshalledRefKey]: generatedRef, value: [...value]};
+				return {[marshalledDataTypeKey]: "uint32array", [marshalledRefKey]: addRef(value, refToRefIdentifierMap), value: [...value]};
 			}
 
 			else if (value instanceof Int8Array) {
-				return {[marshalledDataTypeKey]: "int8array", [marshalledRefKey]: generatedRef, value: [...value]};
+				return {[marshalledDataTypeKey]: "int8array", [marshalledRefKey]: addRef(value, refToRefIdentifierMap), value: [...value]};
 			}
 
 			else if (value instanceof Int16Array) {
-				return {[marshalledDataTypeKey]: "int16array", [marshalledRefKey]: generatedRef, value: [...value]};
+				return {[marshalledDataTypeKey]: "int16array", [marshalledRefKey]: addRef(value, refToRefIdentifierMap), value: [...value]};
 			}
 
 			else if (value instanceof Int32Array) {
-				return {[marshalledDataTypeKey]: "int32array", [marshalledRefKey]: generatedRef, value: [...value]};
+				return {[marshalledDataTypeKey]: "int32array", [marshalledRefKey]: addRef(value, refToRefIdentifierMap), value: [...value]};
 			}
 
 			else if (value instanceof Float32Array) {
-				return {[marshalledDataTypeKey]: "float32array", [marshalledRefKey]: generatedRef, value: [...value]};
+				return {[marshalledDataTypeKey]: "float32array", [marshalledRefKey]: addRef(value, refToRefIdentifierMap), value: [...value]};
 			}
 
 			else if (value instanceof Float64Array) {
-				return {[marshalledDataTypeKey]: "float64array", [marshalledRefKey]: generatedRef, value: [...value]};
+				return {[marshalledDataTypeKey]: "float64array", [marshalledRefKey]: addRef(value, refToRefIdentifierMap), value: [...value]};
 			}
 
 			else if (Array.isArray(value)) {
 				return {
 					[marshalledDataTypeKey]: "array",
-					[marshalledRefKey]: generatedRef,
+					[marshalledRefKey]: addRef(value, refToRefIdentifierMap),
 					value: value.map(v => visitValue(v, refToRefIdentifierMap))
 				};
 			}
@@ -145,7 +163,7 @@ function visitValue<T> (value: T, refToRefIdentifierMap: Map<{}, string>): Marsh
 			else if (isObjectLiteral(value)) {
 				return {
 					[marshalledDataTypeKey]: "object",
-					[marshalledRefKey]: generatedRef,
+					[marshalledRefKey]: addRef(value, refToRefIdentifierMap),
 					value: Object.assign({}, ...Object.entries(value).map(([key, objectValue]) => ({[key]: visitValue(objectValue, refToRefIdentifierMap)})))
 				};
 			}
@@ -215,16 +233,50 @@ function demarshallValue (data: MarshalledDataResult, refMap: Map<string, {}>): 
 				return Symbol(value);
 			}
 
+			case "string-boxed": {
+				const {value} = <IMarshalledStringBoxedData> data;
+				// noinspection JSPrimitiveTypeWrapperUsage
+				const boxedString = new String(value);
+				refMap.set(refMatch!, boxedString);
+				return boxedString;
+			}
+
+			case "number-boxed": {
+				const {value} = <IMarshalledNumberBoxedData> data;
+				// noinspection JSPrimitiveTypeWrapperUsage
+				const boxedNumber = new Number(value);
+				refMap.set(refMatch!, boxedNumber);
+				return boxedNumber;
+			}
+
+			case "boolean-boxed": {
+				const {value} = <IMarshalledBooleanBoxedData> data;
+				// noinspection JSPrimitiveTypeWrapperUsage
+				const boxedBoolean = new Boolean(value);
+				refMap.set(refMatch!, boxedBoolean);
+				return boxedBoolean;
+			}
+
+			case "nan": {
+				return NaN;
+			}
+
+			case "infinity": {
+				return Infinity;
+			}
+
 			case "ref": {
 				const {value} = <IMarshalledRefData> data;
 				const refMapHit = refMap.get(value);
-				if (refMapHit == null) throw new ReferenceError(`Internal Error: Could not resolve a reference for a circular dependency!`);
+				if (refMapHit == null) throw new ReferenceError(`Internal Error: Could not resolve a reference!!`);
 				return refMapHit;
 			}
 
 			case "bigint": {
 				const {value} = <IMarshalledBigIntData> data;
-				return BigInt(value);
+				const bigInt = BigInt(value);
+				refMap.set(refMatch!, bigInt);
+				return bigInt;
 			}
 
 			case "undefined":
@@ -313,7 +365,7 @@ function isObjectLiteral (data: any): data is object {
  */
 function isJsonType (data: any): data is JsonType {
 	const typeofData = typeof data;
-	return typeofData === "string" || typeofData === "number" || typeofData === "boolean";
+	return typeofData === "string" || (typeofData === "number" && !isNaN(data) && data !== Infinity) || typeofData === "boolean";
 }
 
 /**
@@ -361,4 +413,16 @@ function getTypedArray (type: MarshallDataType, args: number[]): Uint8Array | Ui
 		default:
 			throw new TypeError(`The given data type: ${type} can not be used with TypedArrays!`);
 	}
+}
+
+/**
+ * Adds a ref to the given map
+ * @param {T} value
+ * @param {Map<{}, string>} map
+ */
+function addRef<T> (value: T, map: Map<{}, string>): string {
+	// Generate a ref for the value and store it in the Map
+	const generatedRef = generateRef(map.size);
+	map.set(value, generatedRef);
+	return generatedRef;
 }
