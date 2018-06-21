@@ -1,3 +1,12 @@
+## <small>3.0.8 (2018-06-21)</small>
+
+* 3.0.8 ([979fba3](https://github.com/wessberg/marshaller/commit/979fba3))
+* Bumped version ([489b500](https://github.com/wessberg/marshaller/commit/489b500))
+* Extended the behavior of demarshall to also be able to accept MarshalledData ([e8e9dba](https://github.com/wessberg/marshaller/commit/e8e9dba))
+* Updated the name of the marshalled data type key to avoid potential conflicts ([6167c37](https://github.com/wessberg/marshaller/commit/6167c37))
+
+
+
 ## <small>3.0.7 (2018-06-21)</small>
 
 * 3.0.7 ([a131fc1](https://github.com/wessberg/marshaller/commit/a131fc1))
