@@ -11,12 +11,6 @@ import {marshalledDataTypeKey, marshalledRefKey} from "./marshalled-data-keys";
  */
 const SYMBOL_REGEX: RegExp = /Symbol\(([^)]*)\)/;
 
-/**
- * How much to multiply a random number between 0 and 1 with
- * @type {number}
- */
-const REF_QUANTIFIER = 100000000;
-
 // Until Typescript ships typings for BigInt, declare it here
 declare const BigInt: Function;
 
@@ -51,7 +45,7 @@ function visitValue<T> (value: T, refToRefIdentifierMap: Map<{}, string>): Marsh
 	}
 
 	// Generate a ref for the value and store it in the Map
-	const generatedRef = generateRef();
+	const generatedRef = generateRef(refToRefIdentifierMap.size);
 	refToRefIdentifierMap.set(value, generatedRef);
 
 	switch (typeofValue) {
@@ -74,11 +68,18 @@ function visitValue<T> (value: T, refToRefIdentifierMap: Map<{}, string>): Marsh
 			}
 
 			else if (value instanceof Date) {
-				return {[marshalledDataTypeKey]: "date", value: value.toISOString()};
+				return {
+					[marshalledDataTypeKey]: "date",
+					[marshalledRefKey]: generatedRef,
+					value: value.toISOString()};
 			}
 
 			else if (value instanceof RegExp) {
-				return {[marshalledDataTypeKey]: "regexp", value: value.toString()};
+				return {
+					[marshalledDataTypeKey]: "regexp",
+					[marshalledRefKey]: generatedRef,
+					value: value.toString()
+				};
 			}
 
 			else if (value instanceof Set) {
@@ -98,39 +99,39 @@ function visitValue<T> (value: T, refToRefIdentifierMap: Map<{}, string>): Marsh
 			}
 
 			else if (value instanceof Uint8Array) {
-				return {[marshalledDataTypeKey]: "uint8array", value: [...value]};
+				return {[marshalledDataTypeKey]: "uint8array", [marshalledRefKey]: generatedRef, value: [...value]};
 			}
 
 			else if (value instanceof Uint8ClampedArray) {
-				return {[marshalledDataTypeKey]: "uint8clampedarray", value: [...value]};
+				return {[marshalledDataTypeKey]: "uint8clampedarray", [marshalledRefKey]: generatedRef, value: [...value]};
 			}
 
 			else if (value instanceof Uint16Array) {
-				return {[marshalledDataTypeKey]: "uint16array", value: [...value]};
+				return {[marshalledDataTypeKey]: "uint16array", [marshalledRefKey]: generatedRef, value: [...value]};
 			}
 
 			else if (value instanceof Uint32Array) {
-				return {[marshalledDataTypeKey]: "uint32array", value: [...value]};
+				return {[marshalledDataTypeKey]: "uint32array", [marshalledRefKey]: generatedRef, value: [...value]};
 			}
 
 			else if (value instanceof Int8Array) {
-				return {[marshalledDataTypeKey]: "int8array", value: [...value]};
+				return {[marshalledDataTypeKey]: "int8array", [marshalledRefKey]: generatedRef, value: [...value]};
 			}
 
 			else if (value instanceof Int16Array) {
-				return {[marshalledDataTypeKey]: "int16array", value: [...value]};
+				return {[marshalledDataTypeKey]: "int16array", [marshalledRefKey]: generatedRef, value: [...value]};
 			}
 
 			else if (value instanceof Int32Array) {
-				return {[marshalledDataTypeKey]: "int32array", value: [...value]};
+				return {[marshalledDataTypeKey]: "int32array", [marshalledRefKey]: generatedRef, value: [...value]};
 			}
 
 			else if (value instanceof Float32Array) {
-				return {[marshalledDataTypeKey]: "float32array", value: [...value]};
+				return {[marshalledDataTypeKey]: "float32array", [marshalledRefKey]: generatedRef, value: [...value]};
 			}
 
 			else if (value instanceof Float64Array) {
-				return {[marshalledDataTypeKey]: "float64array", value: [...value]};
+				return {[marshalledDataTypeKey]: "float64array", [marshalledRefKey]: generatedRef, value: [...value]};
 			}
 
 			else if (Array.isArray(value)) {
@@ -234,7 +235,9 @@ function demarshallValue (data: MarshalledDataResult, refMap: Map<string, {}>): 
 
 			case "date": {
 				const {value} = <IMarshalledDateData> data;
-				return new Date(value);
+				const date = new Date(value);
+				refMap.set(refMatch!, date);
+				return date;
 			}
 
 			case "uint8array":
@@ -253,7 +256,9 @@ function demarshallValue (data: MarshalledDataResult, refMap: Map<string, {}>): 
 
 			case "regexp": {
 				const {value} = <IMarshalledRegExpData> data;
-				return new Function(`return ${value}`)();
+				const regex = new Function(`return ${value}`)();
+				refMap.set(refMatch!, regex);
+				return regex;
 			}
 
 			case "set": {
@@ -324,8 +329,8 @@ function isMarshalledData (data: any): data is MarshalledData {
  * Generates a ref
  * @returns {string}
  */
-function generateRef (): string {
-	return (Math.random() * REF_QUANTIFIER).toFixed(0);
+function generateRef (currentCount: number): string {
+	return `${++currentCount}`;
 }
 
 /**

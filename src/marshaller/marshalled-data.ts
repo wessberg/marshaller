@@ -23,11 +23,13 @@ export interface IMarshalledBigIntData extends IMarshalledData {
 
 export interface IMarshalledDateData extends IMarshalledData {
 	[marshalledDataTypeKey]: "date";
+	[marshalledRefKey]: string;
 	value: string;
 }
 
 export interface IMarshalledRegExpData extends IMarshalledData {
 	[marshalledDataTypeKey]: "regexp";
+	[marshalledRefKey]: string;
 	value: string;
 }
 
@@ -61,46 +63,55 @@ export interface IMarshalledUndefinedData extends IMarshalledData {
 
 export interface IMarshalledUint8ArrayData extends IMarshalledData {
 	[marshalledDataTypeKey]: "uint8array";
+	[marshalledRefKey]: string;
 	value: number[];
 }
 
 export interface IMarshalledUint8ClampedArrayData extends IMarshalledData {
 	[marshalledDataTypeKey]: "uint8clampedarray";
+	[marshalledRefKey]: string;
 	value: number[];
 }
 
 export interface IMarshalledUint16ArrayData extends IMarshalledData {
 	[marshalledDataTypeKey]: "uint16array";
+	[marshalledRefKey]: string;
 	value: number[];
 }
 
 export interface IMarshalledUint32ArrayData extends IMarshalledData {
 	[marshalledDataTypeKey]: "uint32array";
+	[marshalledRefKey]: string;
 	value: number[];
 }
 
 export interface IMarshalledInt8ArrayData extends IMarshalledData {
 	[marshalledDataTypeKey]: "int8array";
+	[marshalledRefKey]: string;
 	value: number[];
 }
 
 export interface IMarshalledInt16ArrayData extends IMarshalledData {
 	[marshalledDataTypeKey]: "int16array";
+	[marshalledRefKey]: string;
 	value: number[];
 }
 
 export interface IMarshalledInt32ArrayData extends IMarshalledData {
 	[marshalledDataTypeKey]: "int32array";
+	[marshalledRefKey]: string;
 	value: number[];
 }
 
 export interface IMarshalledFloat32ArrayData extends IMarshalledData {
 	[marshalledDataTypeKey]: "float32array";
+	[marshalledRefKey]: string;
 	value: number[];
 }
 
 export interface IMarshalledFloat64ArrayData extends IMarshalledData {
 	[marshalledDataTypeKey]: "float64array";
+	[marshalledRefKey]: string;
 	value: number[];
 }
 
