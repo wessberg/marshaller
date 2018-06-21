@@ -1,3 +1,11 @@
+## <small>3.0.7 (2018-06-21)</small>
+
+* 3.0.7 ([a131fc1](https://github.com/wessberg/marshaller/commit/a131fc1))
+* Bumped version ([57d56c6](https://github.com/wessberg/marshaller/commit/57d56c6))
+* Updated README ([9624a00](https://github.com/wessberg/marshaller/commit/9624a00))
+
+
+
 ## <small>3.0.6 (2018-06-21)</small>
 
 * 3.0.6 ([7356563](https://github.com/wessberg/marshaller/commit/7356563))
