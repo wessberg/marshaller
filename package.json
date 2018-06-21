@@ -1,6 +1,6 @@
 {
 	"name": "@wessberg/marshaller",
-	"version": "3.0.5",
+	"version": "3.0.6",
 	"description": "A lightweight way to serialize and deserialize complex data types non-destructively",
 	"scripts": {
 		"test": "NODE_ENV=TEST ava -v",
