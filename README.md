@@ -26,7 +26,7 @@ You can consider this to be direct replacements for the `JSON.[stringify|parse]`
 ## Supported data types and features
 
 - Anything that is JSON serializable today: `number`, `boolean`, `string`, `array`, `object literal`
-- Circular references
+- References, including circular references
 - `RegExp`
 - `Date`
 - `Map`
@@ -44,6 +44,9 @@ You can consider this to be direct replacements for the `JSON.[stringify|parse]`
 - `UInt32Array`
 - `Float32Array`
 - `Float64Array`
+- `String`
+- `Number`
+- `Boolean`
 
 ## Usage
 ```typescript
