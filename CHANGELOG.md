@@ -1,3 +1,11 @@
+## <small>3.0.5 (2018-06-21)</small>
+
+* 3.0.5 ([d6724be](https://github.com/wessberg/marshaller/commit/d6724be))
+* Added support for referencing the same Dates, Regular Expressions and TypedArrays within the same JS ([86e0901](https://github.com/wessberg/marshaller/commit/86e0901))
+* Bumped version ([87cd9bf](https://github.com/wessberg/marshaller/commit/87cd9bf))
+
+
+
 ## <small>3.0.4 (2018-06-20)</small>
 
 * 3.0.4 ([8c9ad09](https://github.com/wessberg/marshaller/commit/8c9ad09))
