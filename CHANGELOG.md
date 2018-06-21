@@ -1,3 +1,11 @@
+## <small>3.0.6 (2018-06-21)</small>
+
+* 3.0.6 ([7356563](https://github.com/wessberg/marshaller/commit/7356563))
+* Added support for marshalling/demarshalling Boxed primitive types ([67201d0](https://github.com/wessberg/marshaller/commit/67201d0))
+* Bumped version ([1ba4733](https://github.com/wessberg/marshaller/commit/1ba4733))
+
+
+
 ## <small>3.0.5 (2018-06-21)</small>
 
 * 3.0.5 ([d6724be](https://github.com/wessberg/marshaller/commit/d6724be))
