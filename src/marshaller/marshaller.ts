@@ -184,12 +184,12 @@ function visitValue<T> (value: T, refToRefIdentifierMap: Map<{}, string>): Marsh
 }
 
 /**
- * Demarshalls the given string
- * @param {string} value
+ * Demarshalls the given string. MarshalledData can also be optionally provided
+ * @param {string|MarshalledData} value
  * @returns {T}
  */
-export function demarshall<T> (value: string): T {
-	const parsed: MarshalledDataResult = JSON.parse(value);
+export function demarshall<T> (value: string|MarshalledData): T {
+	const parsed: MarshalledDataResult = isMarshalledData(value) ? value : JSON.parse(value);
 	return demarshallValue(parsed, new Map());
 }
 
@@ -364,6 +364,7 @@ function isObjectLiteral (data: any): data is object {
  * @param {*} data
  */
 function isJsonType (data: any): data is JsonType {
+	if (data == null) return false;
 	const typeofData = typeof data;
 	return typeofData === "string" || (typeofData === "number" && !isNaN(data) && data !== Infinity) || typeofData === "boolean";
 }
@@ -372,7 +373,7 @@ function isJsonType (data: any): data is JsonType {
  * Returns true if the given data is some marshalled data
  * @param {*} data
  */
-function isMarshalledData (data: any): data is MarshalledData {
+export function isMarshalledData (data: any): data is MarshalledData {
 	const typeofData = <MarshallDataType> typeof data;
 	return data != null && !isJsonType(data) && !Array.isArray(data) && typeofData !== "symbol" && typeofData !== "bigint" && marshalledDataTypeKey in data;
 }
