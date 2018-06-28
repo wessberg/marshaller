@@ -1,3 +1,12 @@
+## <small>3.0.9 (2018-06-28)</small>
+
+* 3.0.9 ([ff9d96b](https://github.com/wessberg/marshaller/commit/ff9d96b))
+* Avoided 'new Function' when demarshalling regular expressions ([a0af983](https://github.com/wessberg/marshaller/commit/a0af983))
+* Avoided 'new Function' when demarshalling regular expressions ([2f7dcc4](https://github.com/wessberg/marshaller/commit/2f7dcc4))
+* Bumped version ([af86128](https://github.com/wessberg/marshaller/commit/af86128))
+
+
+
 ## <small>3.0.8 (2018-06-21)</small>
 
 * 3.0.8 ([979fba3](https://github.com/wessberg/marshaller/commit/979fba3))
