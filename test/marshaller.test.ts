@@ -153,7 +153,7 @@ test("#16", t => {
 });
 
 test("#17", t => {
-	const original = /\s*foo\s*\(hello\)/;
+	const original = /\s*foo\s*\(hello\)/gm;
 	const marshalled = marshall(original);
 	const demarshalled = demarshall(marshalled);
 	t.deepEqual(original, demarshalled);
