@@ -188,7 +188,7 @@ function visitValue<T> (value: T, refToRefIdentifierMap: Map<{}, string>): Marsh
  * @param {string|MarshalledData} value
  * @returns {T}
  */
-export function demarshall<T> (value: string|MarshalledData): T {
+export function demarshall<T> (value: string | MarshalledData): T {
 	const parsed: MarshalledDataResult = isMarshalledData(value) ? value : JSON.parse(value);
 	return demarshallValue(parsed, new Map());
 }
@@ -308,7 +308,9 @@ function demarshallValue (data: MarshalledDataResult, refMap: Map<string, {}>): 
 
 			case "regexp": {
 				const {value} = <IMarshalledRegExpData> data;
-				const regex = new Function(`return ${value}`)();
+				const flags = value.replace(/.*\/([gimyus]*)$/, "$1");
+				const pattern = value.replace(new RegExp("^/(.*?)/" + flags + "$"), "$1");
+				const regex = new RegExp(pattern, flags);
 				refMap.set(refMatch!, regex);
 				return regex;
 			}
