@@ -1,0 +1,214 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="513" height="659" viewBox="0 0 513 659">
+  <defs>
+    <linearGradient id="a" x1="50%" x2="50%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#A3D4F7"/>
+      <stop offset="100%" stop-color="#4A6273" stop-opacity="0"/>
+    </linearGradient>
+    <path id="c" d="M376.84 112.96c-5.86 0-11.7.58-17.43 1.74a71.86 71.86 0 0 0-100.65-51.1c-18.08-49.8-73.1-75.5-122.9-57.42-49.8 18.07-75.5 73.1-57.43 122.9a79.97 79.97 0 0 0 2.4 159.88h296a88 88 0 0 0 0-176z"/>
+    <filter id="b" width="114.2%" height="122.9%" x="-7.1%" y="-9.4%" filterUnits="objectBoundingBox">
+      <feOffset dy="6" in="SourceAlpha" result="shadowOffsetOuter1"/>
+      <feGaussianBlur in="shadowOffsetOuter1" result="shadowBlurOuter1" stdDeviation="10"/>
+      <feColorMatrix in="shadowBlurOuter1" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.0448369565 0"/>
+    </filter>
+    <linearGradient id="d" x1="0%" y1="50%" y2="50%">
+      <stop offset="0%" stop-color="#43A838"/>
+      <stop offset="100%" stop-color="#93C4E6"/>
+    </linearGradient>
+    <linearGradient id="e" x1="100%" x2="0%" y1="50%" y2="50%">
+      <stop offset="0%" stop-color="#46AA3C"/>
+      <stop offset="100%" stop-color="#A3D4F7"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" fill-rule="evenodd">
+    <path fill="url(#a)" d="M0 0h367v310H0z" transform="translate(69 273)"/>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="13" font-weight="300" letter-spacing="1.3" transform="translate(69 273)">
+      <tspan x="27" y="64">1</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="20" font-weight="300" letter-spacing="2" transform="translate(69 273)">
+      <tspan x="94" y="88">1</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="15" font-weight="300" letter-spacing="1.5" transform="translate(69 273)">
+      <tspan x="210" y="64">1</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="20" font-weight="300" letter-spacing="2" transform="translate(69 273)">
+      <tspan x="227" y="160">1</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="13" font-weight="300" letter-spacing="1.3" transform="translate(69 273)">
+      <tspan x="300" y="98">1</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="15" font-weight="300" letter-spacing="1.5" transform="translate(69 273)">
+      <tspan x="300" y="255">1</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="17" font-weight="300" letter-spacing="1.7" transform="translate(69 273)">
+      <tspan x="134" y="269">1</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="13" font-weight="300" letter-spacing="1.3" transform="translate(69 273)">
+      <tspan x="84" y="160">1</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="15" font-weight="300" letter-spacing="1.5" transform="translate(69 273)">
+      <tspan x="47" y="255">1</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="20" font-weight="300" letter-spacing="2" transform="translate(69 273)">
+      <tspan x="17" y="209">1</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="15" font-weight="300" letter-spacing="1.5" transform="translate(69 273)">
+      <tspan x="164" y="209">1</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="20" font-weight="300" letter-spacing="2" transform="translate(69 273)">
+      <tspan x="164" y="102">1</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="13" font-weight="300" letter-spacing="1.3" transform="translate(69 273)">
+      <tspan x="237" y="279">1</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="17" font-weight="300" letter-spacing="1.7" transform="translate(69 273)">
+      <tspan x="305" y="174">1</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="20" font-weight="300" letter-spacing="2" transform="translate(69 273)">
+      <tspan x="242" y="223">1</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="15" font-weight="300" letter-spacing="1.5" transform="translate(69 273)">
+      <tspan x="247" y="116">1</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="17" font-weight="300" letter-spacing="1.7" transform="translate(69 273)">
+      <tspan x="346" y="78">1</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="19" font-weight="300" letter-spacing="1.9" transform="translate(69 273)">
+      <tspan x="134" y="170">1</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="13" font-weight="300" letter-spacing="1.3" transform="translate(69 273)">
+      <tspan x="37" y="122">1</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="15" font-weight="300" letter-spacing="1.5" transform="translate(69 273)">
+      <tspan x="107" y="122">0</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="15" font-weight="300" letter-spacing="1.5" transform="translate(69 273)">
+      <tspan x="181" y="140">0</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="20" font-weight="300" letter-spacing="2" transform="translate(69 273)">
+      <tspan x="277" y="74">0</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="20" font-weight="300" letter-spacing="2" transform="translate(69 273)">
+      <tspan x="139" y="54">0</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="17" font-weight="300" letter-spacing="1.7" transform="translate(69 273)">
+      <tspan x="89" y="198">0</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="16" font-weight="300" letter-spacing="1.6" transform="translate(69 273)">
+      <tspan x="27" y="180">0</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="14" font-weight="300" letter-spacing="1.4" transform="translate(69 273)">
+      <tspan x="27" y="289">0</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="16" font-weight="300" letter-spacing="1.6" transform="translate(69 273)">
+      <tspan x="115" y="237">0</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="13" font-weight="300" letter-spacing="1.3" transform="translate(69 273)">
+      <tspan x="181" y="269">0</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="15" font-weight="300" letter-spacing="1.5" transform="translate(69 273)">
+      <tspan x="205" y="233">0</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="16" font-weight="300" letter-spacing="1.6" transform="translate(69 273)">
+      <tspan x="295" y="213">0</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="15" font-weight="300" letter-spacing="1.5" transform="translate(69 273)">
+      <tspan x="277" y="146">0</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="12" font-weight="300" letter-spacing="1.2" transform="translate(69 273)">
+      <tspan x="331" y="140">0</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="16" font-weight="300" letter-spacing="1.6" transform="translate(69 273)">
+      <tspan x="331" y="247">0</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="17" font-weight="300" letter-spacing="1.7" transform="translate(69 273)">
+      <tspan x="205" y="194">0</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="15" font-weight="300" letter-spacing="1.5" transform="translate(69 273)">
+      <tspan x="205" y="108">0</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="19" font-weight="300" letter-spacing="1.9" transform="translate(69 273)">
+      <tspan x="82" y="289">0</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="20" font-weight="300" letter-spacing="2" transform="translate(69 273)">
+      <tspan x="257" y="185">0</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="16" font-weight="300" letter-spacing="1.6" transform="translate(69 273)">
+      <tspan x="285" y="283">0</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="15" font-weight="300" letter-spacing="1.5" transform="translate(69 273)">
+      <tspan x="341" y="203">0</tspan>
+    </text>
+    <text fill="#FFF" fill-opacity=".41" font-family="Rubik-Light, Rubik" font-size="17" font-weight="300" letter-spacing="1.7" transform="translate(69 273)">
+      <tspan x="52" y="92">0</tspan>
+    </text>
+    <g fill-rule="nonzero">
+      <g transform="translate(19 13)">
+        <use fill="#000" filter="url(#b)" xlink:href="#c"/>
+        <use fill="#A3D4F7" fill-rule="evenodd" xlink:href="#c"/>
+      </g>
+    </g>
+    <g fill-rule="nonzero" opacity=".59">
+      <path fill="#EFCE4A" d="M178.33 360h-44.66c-.92 0-1.67-.74-1.67-1.66V332h48v26.34c0 .92-.75 1.66-1.67 1.66z"/>
+      <path fill="#EBBA16" d="M153.53 324.59v-4.93c0-.92-.75-1.66-1.67-1.66h-18.19c-.92 0-1.67.74-1.67 1.66V332h48v-5.75c0-.92-.75-1.66-1.67-1.66h-24.8z"/>
+      <path fill="#EFCE4A" d="M408.74 376h-60.48a2.26 2.26 0 0 1-2.26-2.26V338h65v35.74a2.26 2.26 0 0 1-2.26 2.26z"/>
+      <path fill="#EBBA16" d="M375.16 327.94v-6.68a2.26 2.26 0 0 0-2.26-2.26h-24.64a2.26 2.26 0 0 0-2.26 2.26V338h65v-7.8a2.26 2.26 0 0 0-2.26-2.26h-33.58z"/>
+      <path fill="#EFCE4A" d="M231.64 472h-36.28c-.75 0-1.36-.61-1.36-1.37V449h39v21.63c0 .76-.6 1.37-1.36 1.37z"/>
+      <path fill="#EBBA16" d="M211.5 442.18v-3.87c0-.73-.61-1.31-1.36-1.31h-14.78c-.75 0-1.36.58-1.36 1.3v9.7h39v-4.52c0-.72-.6-1.3-1.36-1.3H211.5z"/>
+      <path fill="#EFCE4A" d="M383.64 449h-36.28c-.75 0-1.36-.61-1.36-1.37V426h39v21.63c0 .76-.6 1.37-1.36 1.37z"/>
+      <path fill="#EBBA16" d="M363.5 419.18v-3.87c0-.73-.61-1.31-1.36-1.31h-14.78c-.75 0-1.36.58-1.36 1.3v9.7h39v-4.52c0-.72-.6-1.3-1.36-1.3H363.5z"/>
+      <g>
+        <path fill="#EFCE4A" d="M295.98 404.5h-53.96c-1.12 0-2.02-.9-2.02-2.02V370.5h58v31.98c0 1.12-.9 2.02-2.02 2.02z"/>
+        <path fill="#EBBA16" d="M266.02 361.5v-5.98c0-1.12-.9-2.02-2.02-2.02h-21.98c-1.12 0-2.02.9-2.02 2.02v14.98h58v-6.98c0-1.12-.9-2.02-2.02-2.02h-29.96z"/>
+      </g>
+      <g>
+        <path fill="#EFCE4A" d="M149.33 439h-44.66c-.92 0-1.67-.74-1.67-1.66V411h48v26.34c0 .92-.75 1.66-1.67 1.66z"/>
+        <path fill="#EBBA16" d="M124.53 403.59v-4.93c0-.92-.75-1.66-1.67-1.66h-18.19c-.92 0-1.67.74-1.67 1.66V411h48v-5.75c0-.92-.75-1.66-1.67-1.66h-24.8z"/>
+      </g>
+      <g>
+        <path fill="#EFCE4A" d="M355.91 529H300.1a2.08 2.08 0 0 1-2.09-2.08V494h60v32.92c0 1.15-.94 2.08-2.09 2.08z"/>
+        <path fill="#EBBA16" d="M324.92 485.47v-6.33c0-1.18-.94-2.14-2.1-2.14H300.1c-1.15 0-2.09.96-2.09 2.14V495h60v-7.4c0-1.17-.94-2.13-2.09-2.13h-31z"/>
+      </g>
+    </g>
+    <g fill="#43A838" fill-rule="nonzero">
+      <path d="M11.78 658.35h472.83a5.2 5.2 0 0 0 5.21-5.32c-.43-20.84-.73-136.47 22.94-165.33.66-.8-.15-1.96-1.14-1.62-11.27 3.96-44.88 17.58-53.25 41.79-.33.96-1.7.91-1.97-.07l-13.04-48.62a1.04 1.04 0 0 0-1.93-.19l-14.58 29.87c-.34.71-1.33.79-1.78.14l-33.21-19.78a1.04 1.04 0 0 0-1.87.4l-7.48 44.88c-.21 1.08-1.75 1.12-2.02.05l-28.7-72.95c-.25-1.04-1.71-1.05-2-.03l-14.16 50.56a1.04 1.04 0 0 1-1.94.14l-28.04-30.8c-.4-.87-1.67-.79-1.94.13l-12.73 40.76c-.3 1.01-1.75.97-2-.06l-16.11-24.63a1.04 1.04 0 0 0-1.96-.16l-24.2 50.7c-.36.85-1.56.85-1.92.01l-37.54-62.14c-.46-1.08-2.08-.69-1.99.48 1.49 18.06 1.54 36.22-16.89 58.97-.51.63-1.52.48-1.8-.3l-19.35-36.37c-.34-.95-1.7-.9-1.97.07l-16.35 39.22a1.04 1.04 0 0 1-1.9.23c-5.84-10.3-27.92-25.18-15.86-66.82 0 0-33.71 10.05-34.79 40.64-.04 1.13-1.6 1.37-2 .32l-13.1-34.7a1.04 1.04 0 0 0-1.96.08l-15.93 56.83c-.3 1.1-1.9.97-2.03-.16-1.75-15.92-10.9-60.63-58.72-92.83-.81-.55-1.86.25-1.56 1.18 4.63 14.42 24.25 121.17 5.68 199a5.2 5.2 0 0 0 5.05 6.43z"/>
+    </g>
+    <g fill="url(#d)" fill-rule="nonzero" opacity=".89" transform="rotate(-90 401.5 127.5)">
+      <path d="M4.68 38.86h201.18v15.55c0 .7.46 1.3 1.39 1.82a6.7 6.7 0 0 0 3.29.77c1.36 0 2.49-.24 3.36-.73l46.79-25.9c.87-.5 1.31-1.11 1.31-1.87s-.44-1.38-1.32-1.86L214.05.8a8.31 8.31 0 0 0-3.51-.81c-1.37 0-2.49.24-3.37.73-.87.48-1.31 1.1-1.31 1.86v15.55H4.68c-1.27 0-2.37.25-3.3.77C.47 19.4 0 20.03 0 20.73v15.54c0 .7.46 1.31 1.39 1.82.93.52 2.02.77 3.29.77z"/>
+    </g>
+    <g fill="url(#e)" fill-rule="nonzero" opacity=".89" transform="rotate(90 -13 254)">
+      <path d="M4.68 38.86h201.18v15.55c0 .7.46 1.3 1.39 1.82a6.7 6.7 0 0 0 3.29.77c1.36 0 2.49-.24 3.36-.73l46.79-25.9c.87-.5 1.31-1.11 1.31-1.87s-.44-1.38-1.32-1.86L214.05.8a8.31 8.31 0 0 0-3.51-.81c-1.37 0-2.49.24-3.37.73-.87.48-1.31 1.1-1.31 1.86v15.55H4.68c-1.27 0-2.37.25-3.3.77C.47 19.4 0 20.03 0 20.73v15.54c0 .7.46 1.31 1.39 1.82.93.52 2.02.77 3.29.77z"/>
+    </g>
+    <g fill-rule="nonzero">
+      <path fill="#E6646E" d="M288.47 497.41l2.23-1.06c.68-.33.86-1.21.35-1.77a34.27 34.27 0 0 0-11.63-8.47l1.67-1.11c.77-.51.65-1.67-.2-2-5.22-2-19.9-5.87-30.89 8.76l34.35 27.08a5.34 5.34 0 0 0 8.65-4.18v-4.12c0-8.6-4.53-13.13-4.53-13.13z"/>
+      <path fill="#DC4655" d="M289.6 509.6a46.2 46.2 0 0 0-4.36-8.46c-2.79-4.41-10.2-16.14-21.07-16.14-1.4 0-2.83.2-4.24.6a13.96 13.96 0 0 0-5.33 2.92l-3.6 3.24 31.97 23.07c4.39 3.36 8.33-1.18 6.62-5.23z"/>
+      <path fill="#E6646E" d="M224.13 474.81L248.08 502l7.92-9.09-31.26-18.84c-.48-.28-.98.33-.61.74z"/>
+      <path fill="#EDEBED" d="M291.89 523.9c-1.33-4.05-5.92-15.58-9.17-20.73-3.62-5.75-11.65-17.8-22.85-14.66a11.73 11.73 0 0 0-4.47 2.49l-31.8 28.62c-.44.4-.68 1.02-.57 1.61.26 1.37 1.06 2 1.9 2.29.37.12.67.37.85.72l1.2 2.43a2.23 2.23 0 0 0 3.07 1c.41-.23.86-.51 1.33-.8l3.9 2.38c.67.41 1.5.44 2.2.08 3.34-1.76 13.64-6.9 21.27-7.99 1.6-.22 3.07-.65 4.44-1.21l8.4 22.15c.29.74 1.23.96 1.81.42l17.87-16.45c.65-.6.9-1.51.62-2.35z"/>
+      <g fill="#DBD9DC">
+        <path d="M259.08 478.02v11.32c0 1.23.98 2.28 2.31 2.49l2.6.4c1.8.27 3.4-1.08 3.22-2.73-.78-7.48-4.22-10.87-6.37-12.28-.73-.49-1.76-.02-1.76.8zM270.33 519.3a2.3 2.3 0 0 1 .17-2.47c.6-.8 1.1-1.67 1.51-2.59 1.65-3.7 1.62-7.86-.07-12.03a1.11 1.11 0 0 0-1.47-.62c-.57.24-.84.9-.6 1.48 1.45 3.58 1.49 7.12.1 10.24a13.17 13.17 0 0 1-6.8 6.56l8.41 22.36c.29.75 1.22.97 1.8.43l6.52-6.04-9.57-17.31z"/>
+      </g>
+      <path fill="#9C969E" d="M227.9 521.52c-.34-.71-1.45-.77-2.2.32-.36.53-.68 1.03-1.7 1.24.23.17.48.3.74.39.28.1.5.3.68.53 2.15-.18 2.87-1.65 2.48-2.48z"/>
+      <path fill="#C0BCC1" d="M234.4 528a36.08 36.08 0 0 0 6.25-4.93c.47-.48.47-1.25 0-1.72a1.2 1.2 0 0 0-1.71 0c-2.09 2.12-4.97 3.92-6.94 5.2l2.4 1.45z"/>
+      <path fill="#4B3F4E" d="M255.5 504c-1.6 0-3.11-.46-4.12-1.26a.92.92 0 0 1-.1-1.4 1.23 1.23 0 0 1 1.6-.09c.6.48 1.57.76 2.62.76s2.03-.28 2.63-.76a1.23 1.23 0 0 1 1.58.08.92.92 0 0 1-.09 1.4 6.74 6.74 0 0 1-4.12 1.27z"/>
+      <path fill="#00C3FF" d="M240 492.6l6 6.4v-12.61l-6-3.39z"/>
+      <path fill="#D4F582" d="M234 486.6l6 6.4v-9.6l-6-3.4z"/>
+      <path fill="#FFC850" d="M229 480.6l6 6.4v-6.6l-6-3.4z"/>
+      <path fill="#E6646E" d="M229 476.48l-4.24-2.4c-.49-.29-1 .3-.63.7L229 480v-3.52z"/>
+    </g>
+    <g fill-rule="nonzero">
+      <path fill="#E6646E" d="M295.16 172.25l3.36-1.64c1.03-.5 1.3-1.86.54-2.72-2.64-3-8.78-9.2-17.59-13.03l2.53-1.71a1.75 1.75 0 0 0-.32-3.07c-7.87-3.09-30.08-9.03-46.68 13.48l51.92 41.66c5.3 4.25 13.08.41 13.08-6.44v-6.33c0-13.25-6.84-20.2-6.84-20.2z"/>
+      <path fill="#DC4655" d="M296.38 190.3c-2.78-6.6-3.89-8.56-6.58-12.82-4.22-6.7-15.44-24.48-31.88-24.48-2.12 0-4.28.3-6.41.9a21.1 21.1 0 0 0-8.06 4.44l-5.45 4.9 48.37 34.99c6.63 5.09 12.6-1.8 10.01-7.93z"/>
+      <path fill="#E6646E" d="M197.2 137.25L233.86 179 246 165.04l-47.87-28.93c-.73-.44-1.5.5-.94 1.14z"/>
+      <path fill="#EDEBED" d="M300.83 211.83c-2.01-6.2-9.01-23.79-13.95-31.65-5.51-8.8-17.74-27.18-34.77-22.4a17.83 17.83 0 0 0-6.81 3.8l-48.38 43.72a2.69 2.69 0 0 0-.88 2.45c.4 2.1 1.61 3.07 2.9 3.5.56.18 1.02.57 1.29 1.1l1.82 3.71a3.38 3.38 0 0 0 4.67 1.51c.63-.34 1.32-.76 2.02-1.22l5.95 3.65c1.02.63 2.27.67 3.33.12 5.1-2.68 20.77-10.55 32.39-12.2 2.42-.34 4.67-.99 6.75-1.85l12.8 33.82a1.7 1.7 0 0 0 2.74.66l27.2-25.13a3.44 3.44 0 0 0 .93-3.6z"/>
+      <g fill="#DBD9DC">
+        <path d="M251.13 142.55v17.14c0 1.87 1.49 3.47 3.52 3.78l3.97.6c2.71.41 5.15-1.64 4.89-4.13-1.2-11.33-6.43-16.47-9.7-18.61-1.12-.73-2.68-.03-2.68 1.22zM268.26 205.1a3.47 3.47 0 0 1 .26-3.75c.91-1.22 1.69-2.53 2.3-3.92 2.52-5.61 2.48-11.92-.1-18.24a1.7 1.7 0 0 0-2.24-.93 1.72 1.72 0 0 0-.92 2.24c2.21 5.42 2.27 10.79.15 15.52-1.92 4.31-5.59 7.81-10.35 9.93l12.82 33.88a1.7 1.7 0 0 0 2.74.66l9.92-9.16-14.58-26.23z"/>
+      </g>
+      <path fill="#9C969E" d="M203.85 207.87c-.5-1.2-2.17-1.29-3.3.53-.54.89-1.03 1.72-2.55 2.06.35.28.73.5 1.11.65.42.16.75.5 1.02.89 3.23-.3 4.3-2.76 3.72-4.13z"/>
+      <path fill="#C0BCC1" d="M212.48 218a52.03 52.03 0 0 0 9.01-7.05c.68-.68.68-1.77 0-2.45a1.75 1.75 0 0 0-2.47.01c-3.01 3.02-7.18 5.6-10.02 7.41l3.48 2.08z"/>
+      <path fill="#4B3F4E" d="M246 182c-2.5 0-4.84-.77-6.42-2.1a1.6 1.6 0 0 1-.14-2.35 1.82 1.82 0 0 1 2.48-.13 6.5 6.5 0 0 0 4.08 1.26 6.5 6.5 0 0 0 4.08-1.26 1.82 1.82 0 0 1 2.48.13 1.6 1.6 0 0 1-.14 2.35A10.02 10.02 0 0 1 246 182z"/>
+      <path fill="#00C3FF" d="M222 164.41l9 9.59v-18.91l-9-5.09z"/>
+      <path fill="#D4F582" d="M213 155.16l9 9.84v-14.78l-9-5.22z"/>
+      <path fill="#FFC850" d="M205 145.4l9 9.6v-9.91l-9-5.09z"/>
+      <path fill="#E6646E" d="M204 139.72l-5.94-3.61c-.68-.42-1.4.47-.88 1.07L204 145v-5.28z"/>
+    </g>
+  </g>
+</svg>
