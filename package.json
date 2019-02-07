@@ -1,6 +1,6 @@
 {
 	"name": "@wessberg/marshaller",
-	"version": "3.0.9",
+	"version": "3.0.10",
 	"description": "A lightweight way to serialize and deserialize complex data types non-destructively",
 	"scripts": {
 		"generate:readme": "scaffold readme --yes",
