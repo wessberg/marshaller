@@ -1,9 +1,6 @@
 import test from "ava";
 import { demarshall, marshall } from "../src/marshaller/marshaller";
 
-// tslint:disable:no-any
-// tslint:disable:no-construct
-
 test("#1", t => {
   const original = undefined;
   const marshalled = marshall(original);

@@ -23,18 +23,11 @@ import {
   marshalledRefKey
 } from "./marshalled-data-keys";
 
-// tslint:disable:no-any
-// tslint:disable:no-shadowed-variable
-// tslint:disable:no-construct
-
 /**
  * A Regular expression that matches the description of a Symbol
  * @type {RegExp}
  */
 const SYMBOL_REGEX: RegExp = /Symbol\(([^)]*)\)/;
-
-// Until Typescript ships typings for BigInt, declare it here
-declare const BigInt: Function;
 
 /**
  * Marshalls the given value
@@ -314,10 +307,11 @@ function demarshallValue(
       case "ref": {
         const { value } = <IMarshalledRefData>data;
         const refMapHit = refMap.get(value);
-        if (refMapHit == null)
+        if (refMapHit == null) {
           throw new ReferenceError(
             `Internal Error: Could not resolve a reference!!`
           );
+        }
         return refMapHit;
       }
 
@@ -452,7 +446,7 @@ export function isMarshalledData(data: any): data is MarshalledData {
  * @returns {string}
  */
 function generateRef(currentCount: number): string {
-  return `${++currentCount}`;
+  return `${currentCount + 1}`;
 }
 
 /**
