@@ -24,6 +24,9 @@
 		"version": "npm run generate:all && git add .",
 		"release": "np --no-cleanup --no-yarn"
 	},
+	"files": [
+		"dist/**/*.*"
+	],
 	"keywords": [
 		"marshaller",
 		"marshalling",
