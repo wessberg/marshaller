@@ -41,7 +41,7 @@
 	"devDependencies": {
 		"@wessberg/ts-config": "0.0.39",
 		"@wessberg/rollup-plugin-ts": "1.1.28",
-		"@wessberg/scaffold": "1.0.15",
+		"@wessberg/scaffold": "1.0.17",
 		"standard-changelog": "^2.0.6",
 		"rollup": "^1.1.2",
 		"ava": "^1.2.1",
