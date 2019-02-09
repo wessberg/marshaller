@@ -13,6 +13,7 @@
 <!-- SHADOW_SECTION_BADGES_START -->
 
 <a href="https://npmcharts.com/compare/%40wessberg%2Fmarshaller?minimal=true"><img alt="Downloads per month" src="https://img.shields.io/npm/dm/%40wessberg%2Fmarshaller.svg"    /></a>
+<a href="https://www.npmjs.com/package/%40wessberg%2Fmarshaller"><img alt="NPM version" src="https://badge.fury.io/js/%40wessberg%2Fmarshaller.svg"    /></a>
 <a href="https://david-dm.org/wessberg/marshaller"><img alt="Dependencies" src="https://img.shields.io/david/wessberg%2Fmarshaller.svg"    /></a>
 <a href="https://github.com/wessberg/marshaller/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/wessberg%2Fmarshaller.svg"    /></a>
 <a href="https://github.com/prettier/prettier"><img alt="code style: prettier" src="https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square"    /></a>
@@ -64,8 +65,8 @@ You can consider this to be direct replacements for the `JSON.[stringify|parse]`
 - [Maintainers](#maintainers)
 - [Backers](#backers)
   - [Patreon](#patreon)
-  - [FAQ](#faq)
-    - [Why are functions not supported](#why-are-functions-not-supported)
+- [FAQ](#faq)
+  - [Why are functions not supported](#why-are-functions-not-supported)
 - [License](#license)
 
 <!-- SHADOW_SECTION_TOC_END -->
@@ -124,7 +125,7 @@ import {marshall, demarshall} from "@wessberg/marshaller";
 
 // Marshall some complex data that wouldn't normally be JSON serializable
 const marshallResult = marshall({
-  a: new Set([1, 2, /foo/, {a: new Date(), b: new Float32Array([1, 2, 3])}])
+	a: new Set([1, 2, /foo/, {a: new Date(), b: new Float32Array([1, 2, 3])}])
 });
 
 // Demarshall it to get a structurally identical representation back of the data
@@ -163,7 +164,7 @@ Do you want to contribute? Awesome! Please follow [these recommendations](./CONT
 
 <!-- SHADOW_SECTION_FAQ_START -->
 
-### FAQ
+## FAQ
 
 <!-- SHADOW_SECTION_FAQ_END -->
 

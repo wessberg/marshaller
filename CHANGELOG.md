@@ -1,3 +1,7 @@
+## [3.0.11](https://github.com/wessberg/marshaller/compare/v3.0.10...v3.0.11) (2019-02-09)
+
+
+
 ## [3.0.10](https://github.com/wessberg/marshaller/compare/v3.0.9...v3.0.10) (2019-02-07)
 
 
